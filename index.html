@@ -109,6 +109,7 @@
 <section class="sec" id="result"><div class="grid g2">
 <div class="card"><h2>資産推移</h2><canvas id="chart" width="900" height="320"></canvas><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済</div></div>
 <div class="card"><h2>経済的自由度</h2><div id="freedom"></div></div>
+<div class="card" style="grid-column:1/-1"><h2>世帯収支の推移</h2><div class="muted">各年の収入・支出・積立を年額で表示します。収入は「復職前世帯手取り＋復職後の家計純増＋児童手当」をベースにした概算です。</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>年齢</th><th>世帯収入</th><th>生活・子育て</th><th>返済</th><th>旅行・自由費</th><th>投資・貯蓄</th><th>年間収支</th></tr></thead><tbody id="cashflowTable"></tbody></table></div></div>
 <div class="card"><h2>節目</h2><div class="scroll"><table><thead><tr><th>年齢</th><th>総資産</th><th>流動</th><th>拘束</th></tr></thead><tbody id="milestones"></tbody></table></div></div>
 <div class="card"><h2>75歳時点内訳</h2><div class="scroll"><table><tbody id="breakdown"></tbody></table></div></div>
 <div class="card" style="grid-column:1/-1"><h2>シナリオ比較</h2><div class="muted">上部で比較したいシナリオにチェックを入れてください（最大4件推奨）。</div><div class="scroll" style="margin-top:8px"><table class="compareTable"><thead id="compareHead"></thead><tbody id="compareBody"></tbody></table></div></div>
@@ -126,7 +127,7 @@ function events(){return [...document.querySelectorAll('.event')].map(r=>({name:
 function addEvent(e={name:'大型支出',y:5,amt:50}){let d=document.createElement('div');d.className='event';d.innerHTML='<div class="field"><label>名称</label><input class="en" value="'+e.name+'"></div><div class="field"><label>年後</label><input class="ey" type="number" value="'+e.y+'"></div><div class="field"><label>金額</label><input class="ea" type="number" value="'+e.amt+'"><span class="u">万円。収入はマイナス</span></div><button>削除</button>';d.querySelector('button').onclick=()=>{d.remove();calc()};d.querySelectorAll('input').forEach(x=>x.oninput=calc);$('events').appendChild(d)}
 function sim(){
  let age=n('age'),years=Math.max(1,75-age),cash=n('cashH')+n('cashW'),loan=n('loan'),tax=n('taxable'),btc=n('btc'),ideco=n('ideco'),nisa=n('nisa'),k=n('kyosai'),mom=n('momDebt'),spent=0,out=[],ev=events(),rs=mr(n('rStock')),ri=mr(n('rIdeco')),rb=mr(n('rBtc')),rk=mr(n('rK'));
- for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent});if(y===years)break;
+ for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent,income:0,livingCost:0,debtCost:0,lifestyleCost:0,savingCost:0,netCashflow:0});if(y===years)break;
   let returned=y>=n('returnYear'),living=n('living')*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=childAges(y).filter(a=>a>=18&&a<23).length*80/12,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
   let surplus=n('netBefore')-living-cc-college-old-stu-mp-trav-free+(returned?n('wifeGain'):0);
   let cm=n('cashM'),nm=n('nisaM'),im=n('idecoM'),km=n('kyosaiM');
@@ -134,6 +135,14 @@ function sim(){
   nm+=kids(y)*n('allowance')/12;
   let planned=cm+nm+im+km,avail=Math.max(0,surplus);if(planned>avail){let cut=planned-avail,q=Math.min(cm,cut);cm-=q;cut-=q;q=Math.min(nm,cut);nm-=q;cut-=q;q=Math.min(km,cut);km-=q;cut-=q;q=Math.min(im,cut);im-=q}
   planned=cm+nm+im+km;let extra=Math.max(0,avail-planned);if(cash<n('buffer'))cm+=extra;else nm+=extra;
+  const allowanceAnnual=kids(y)*n('allowance');
+  const incomeAnnual=(n('netBefore')+(returned?n('wifeGain'):0))*12+allowanceAnnual;
+  const livingAnnual=(living+cc+college)*12;
+  const debtAnnual=(old+stu+mp)*12;
+  const lifestyleAnnual=(trav+free)*12;
+  const savingAnnual=(cm+nm+im+km)*12;
+  const netAnnual=incomeAnnual-livingAnnual-debtAnnual-lifestyleAnnual-savingAnnual;
+  Object.assign(out[out.length-1],{income:incomeAnnual,livingCost:livingAnnual,debtCost:debtAnnual,lifestyleCost:lifestyleAnnual,savingCost:savingAnnual,netCashflow:netAnnual});
   for(let m=0;m<12;m++){tax*=1+rs;nisa=nisa*(1+rs)+nm;ideco=ideco*(1+ri)+im;btc*=1+rb;k=k*(1+rk)+km;cash+=cm;spent+=trav+free;if(mom>0)mom=Math.max(0,mom-mp)}
   if(Math.round(y+1)===Math.round(n('carY'))){cash-=Math.max(0,n('carBuy')-n('carSell'))}
   if(n('kominka')>0&&Math.round(y+1)===Math.round(n('kominkaY')))cash-=n('kominka');
@@ -142,7 +151,11 @@ function sim(){
  } return out
 }
 function draw(r){let c=$('chart'),x=c.getContext('2d'),W=c.width,H=c.height,p={l:55,r:18,t:20,b:35},max=Math.max(...r.map(v=>v.total),1)*1.08,X=i=>p.l+(W-p.l-p.r)*i/(r.length-1),Y=v=>H-p.b-(H-p.t-p.b)*v/max;x.clearRect(0,0,W,H);x.font='12px sans-serif';for(let i=0;i<=4;i++){let v=max*i/4,y=Y(v);x.strokeStyle='#293243';x.beginPath();x.moveTo(p.l,y);x.lineTo(W-p.r,y);x.stroke();x.fillStyle='#9aa6b2';x.fillText(Math.round(v)+'万',5,y+4)}function line(k,col){x.beginPath();r.forEach((v,i)=>i?x.lineTo(X(i),Y(v[k])):x.moveTo(X(i),Y(v[k])));x.strokeStyle=col;x.lineWidth=2.5;x.stroke()}line('total','#8fd3ff');line('liquid','#90be6d');line('locked','#f1c75b')}
-function calc(){let r=sim(),now=r[0],ten=r.find(x=>x.y===10)||r.at(-1),sixty=r.find(x=>x.age===60)||r.at(-1),last=r.at(-1);$('s0').textContent=man(now.total);$('sc').textContent=man(now.cash);$('s10').textContent=man(ten.total);$('s60').textContent=man(sixty.total);$('sspend').textContent=man(last.spent);$('milestones').innerHTML=[35,40,45,50,55,60,65,70,75].filter(a=>a>=n('age')).map(a=>{let q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');$('breakdown').innerHTML=[['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k],['母への残債',-last.mom]].map(a=>'<tr><td>'+a[0]+'</td><td>'+man(a[1])+'</td></tr>').join('');$('freedom').innerHTML=[40,45,50,55,60].map(a=>{let q=r.find(x=>x.age===a);if(!q)return'';let ml=n('living')*Math.pow(1+n('infl')/100,a-n('age')),yc=q.liquid/(ml*12);return '<div class="status"><b>'+a+'歳</b>：流動資産 '+man(q.liquid)+' ／ 生活費約 '+yc.toFixed(1)+'年分</div>'}).join('')+'<div class="status">目標は仕事を辞めることではなく、<b>お金に困らず好きだから働ける状態</b>。</div>';draw(r)}
+function renderCashflow(r){
+  const ages=[n('age'),35,40,45,50,55,60,65,70,75].filter((a,i,arr)=>a>=n('age')&&arr.indexOf(a)===i);
+  $('cashflowTable').innerHTML=ages.map(a=>{let q=r.find(x=>x.age===a)||r.at(-1);return '<tr><td>'+a+'歳</td><td>'+man(q.income)+'</td><td>'+man(q.livingCost)+'</td><td>'+man(q.debtCost)+'</td><td>'+man(q.lifestyleCost)+'</td><td>'+man(q.savingCost)+'</td><td>'+man(q.netCashflow)+'</td></tr>'}).join('');
+}
+function calc(){let r=sim(),now=r[0],ten=r.find(x=>x.y===10)||r.at(-1),sixty=r.find(x=>x.age===60)||r.at(-1),last=r.at(-1);$('s0').textContent=man(now.total);$('sc').textContent=man(now.cash);$('s10').textContent=man(ten.total);$('s60').textContent=man(sixty.total);$('sspend').textContent=man(last.spent);$('milestones').innerHTML=[35,40,45,50,55,60,65,70,75].filter(a=>a>=n('age')).map(a=>{let q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');$('breakdown').innerHTML=[['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k],['母への残債',-last.mom]].map(a=>'<tr><td>'+a[0]+'</td><td>'+man(a[1])+'</td></tr>').join('');$('freedom').innerHTML=[40,45,50,55,60].map(a=>{let q=r.find(x=>x.age===a);if(!q)return'';let ml=n('living')*Math.pow(1+n('infl')/100,a-n('age')),yc=q.liquid/(ml*12);return '<div class="status"><b>'+a+'歳</b>：流動資産 '+man(q.liquid)+' ／ 生活費約 '+yc.toFixed(1)+'年分</div>'}).join('')+'<div class="status">目標は仕事を辞めることではなく、<b>お金に困らず好きだから働ける状態</b>。</div>';renderCashflow(r);draw(r)}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.t).classList.add('active');calc();renderCompare()});ids.forEach(id=>$(id).oninput=()=>{calc();markDirty()});$('calc').onclick=()=>{calc();renderCompare()};$('addEvent').onclick=()=>{addEvent();markDirty()};
 
 const BASE_VALUES=Object.fromEntries(ids.map(id=>[id,$(id).value]));
@@ -196,6 +209,12 @@ function renderCompare(){
     ['50歳 流動資産',c=>c.res.a50.liquid],
     ['60歳 総資産',c=>c.res.a60.total],
     ['60歳 流動資産',c=>c.res.a60.liquid],
+    ['40歳 年間世帯収入',c=>c.res.a40.income],
+    ['40歳 年間総支出（積立除く）',c=>c.res.a40.livingCost+c.res.a40.debtCost+c.res.a40.lifestyleCost],
+    ['50歳 年間世帯収入',c=>c.res.a50.income],
+    ['50歳 年間総支出（積立除く）',c=>c.res.a50.livingCost+c.res.a50.debtCost+c.res.a50.lifestyleCost],
+    ['60歳 年間世帯収入',c=>c.res.a60.income],
+    ['60歳 年間総支出（積立除く）',c=>c.res.a60.livingCost+c.res.a60.debtCost+c.res.a60.lifestyleCost],
     ['75歳 総資産',c=>c.res.a75.total],
     ['旅行・自由費累計',c=>c.res.final.spent],
     ['75歳 母への残債',c=>-c.res.final.mom]
