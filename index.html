@@ -66,28 +66,53 @@
 </section>
 
 <section class="sec" id="family"><div class="grid g2">
-<div class="card"><h2>役員報酬・手取り</h2><div class="grid g2">
-<div class="field"><label>本人 役員報酬</label><input id="execSalaryH" value="32" step=".5" type="number"><span class="u">万円/月 額面</span></div>
-<div class="field"><label>配偶者 役員報酬</label><input id="execSalaryW" value="8.5" step=".5" type="number"><span class="u">万円/月 額面</span></div>
-<div class="field"><label>配偶者の社保</label><select id="wifeSocial"><option value="dependent" selected>扶養内（本人社保なし）</option><option value="join">本人加入</option></select></div>
-<div class="field"><label>本人の現在年齢</label><div class="note" style="margin:0">基本設定の「現在年齢」を使用。40〜64歳は介護保険を自動加算。</div></div>
+<div class="card"><h2>役員報酬・手取り</h2>
+<div class="grid g2">
+<div class="field"><label>復職前：本人 役員報酬</label><input id="execSalaryHBefore" value="32" step=".5" type="number"><span class="u">万円/月 額面</span></div>
+<div class="field"><label>復職前：配偶者 役員報酬</label><input id="execSalaryWBefore" value="8.5" step=".5" type="number"><span class="u">万円/月 額面</span></div>
+<div class="field"><label>復職後：本人 役員報酬</label><input id="execSalaryHAfter" value="32" step=".5" type="number"><span class="u">万円/月 額面</span></div>
+<div class="field"><label>復職後：配偶者 役員報酬</label><input id="execSalaryWAfter" value="8.5" step=".5" type="number"><span class="u">万円/月 額面</span></div>
+<div class="field"><label>配偶者の役員報酬に対する社保</label><select id="wifeSocial"><option value="dependent" selected>本人社保なし</option><option value="join">本人加入</option></select></div>
 <div class="field"><label>妻復職</label><input id="returnYear" value="2" type="number"><span class="u">年後</span></div>
-<div class="field"><label>看護師給与</label><input id="wifeSalary" value="30" type="number"><span class="u">万円/月 額面</span></div>
-<div class="field"><label>復職による家計純増</label><input id="wifeGain" value="20" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>看護師給与</label><input id="wifeSalary" value="30" type="number"><span class="u">万円/月 額面・参考</span></div>
+<div class="field"><label>看護師復職による家計純増</label><input id="wifeGain" value="20" type="number"><span class="u">万円/月</span></div>
 </div>
+<div class="note">復職後は、役員報酬の手取りを復職後の金額で再計算し、さらに看護師勤務による「家計純増」を加算します。</div>
+
+<h3 style="margin:16px 0 8px">役員賞与</h3>
+<div class="grid g2">
+<div class="field"><label>本人 役員賞与</label><input id="bonusH" value="200" step="10" type="number"><span class="u">万円/年 額面</span></div>
+<div class="field"><label>配偶者 役員賞与</label><input id="bonusW" value="0" step="10" type="number"><span class="u">万円/年 額面</span></div>
+<div class="field"><label>賞与の想定</label><select id="bonusMode"><option value="annual" selected>毎年支給する</option><option value="none">支給しない</option></select></div>
+</div>
+<div class="note">シミュレーションでは賞与を年1回支給する前提で、賞与分の社会保険と年間所得税・住民税を概算します。実際の事前確定届出給与は届出時期・金額・支給日などの税務要件を別途確認してください。</div>
+
 <div class="grid g2" style="margin-top:12px">
-  <div class="budgetTotal">復職前 世帯手取り：<span id="houseNetBefore">-</span> / 月</div>
-  <div class="budgetTotal">復職後 世帯手取り：<span id="houseNetAfter">-</span> / 月</div>
+  <div class="budgetTotal">復職前 世帯手取り：<span id="houseNetBefore">-</span> / 月平均</div>
+  <div class="budgetTotal">復職後 世帯手取り：<span id="houseNetAfter">-</span> / 月平均</div>
 </div>
-<div class="scroll" style="margin-top:8px"><table><thead><tr><th></th><th>本人</th><th>配偶者</th></tr></thead><tbody>
-<tr><td>額面</td><td id="grossH">-</td><td id="grossW">-</td></tr>
-<tr><td>健康・介護保険</td><td id="healthH">-</td><td id="healthW">-</td></tr>
-<tr><td>厚生年金</td><td id="pensionH">-</td><td id="pensionW">-</td></tr>
-<tr><td>所得税等</td><td id="incomeTaxH">-</td><td id="incomeTaxW">-</td></tr>
-<tr><td>住民税</td><td id="residentH">-</td><td id="residentW">-</td></tr>
-<tr><td><b>手取り</b></td><td id="netH"><b>-</b></td><td id="netW"><b>-</b></td></tr>
+<div class="grid g2" style="margin-top:8px">
+  <div class="note">復職前 年間世帯手取り：<b id="houseNetBeforeY">-</b></div>
+  <div class="note">復職後 年間世帯手取り：<b id="houseNetAfterY">-</b></div>
+</div>
+
+<div class="scroll" style="margin-top:10px"><table><thead><tr><th>復職前</th><th>本人</th><th>配偶者</th></tr></thead><tbody>
+<tr><td>月額役員報酬</td><td id="grossHBefore">-</td><td id="grossWBefore">-</td></tr>
+<tr><td>年額賞与</td><td id="bonusHBefore">-</td><td id="bonusWBefore">-</td></tr>
+<tr><td>社会保険（年額）</td><td id="socialHBefore">-</td><td id="socialWBefore">-</td></tr>
+<tr><td>所得税等（年額）</td><td id="incomeTaxHBefore">-</td><td id="incomeTaxWBefore">-</td></tr>
+<tr><td>住民税（年額）</td><td id="residentHBefore">-</td><td id="residentWBefore">-</td></tr>
+<tr><td><b>年間手取り</b></td><td id="netHBefore"><b>-</b></td><td id="netWBefore"><b>-</b></td></tr>
 </tbody></table></div>
-<div class="note">2026年分の税制・2026年度の協会けんぽ大阪を使った概算です。標準報酬月額、給与所得控除、基礎控除、配偶者控除を反映します。実際の源泉徴収・住民税は前年所得や各種控除で差が出ます。</div>
+
+<div class="scroll" style="margin-top:10px"><table><thead><tr><th>復職後</th><th>本人</th><th>配偶者</th></tr></thead><tbody>
+<tr><td>月額役員報酬</td><td id="grossHAfter">-</td><td id="grossWAfter">-</td></tr>
+<tr><td>年額賞与</td><td id="bonusHAfter">-</td><td id="bonusWAfter">-</td></tr>
+<tr><td>社会保険（年額）</td><td id="socialHAfter">-</td><td id="socialWAfter">-</td></tr>
+<tr><td>所得税等（年額）</td><td id="incomeTaxHAfter">-</td><td id="incomeTaxWAfter">-</td></tr>
+<tr><td>住民税（年額）</td><td id="residentHAfter">-</td><td id="residentWAfter">-</td></tr>
+<tr><td><b>年間手取り</b></td><td id="netHAfter"><b>-</b></td><td id="netWAfter"><b>-</b></td></tr>
+</tbody></table></div>
 </div>
 <div class="card"><h2>子ども</h2><div class="grid g2">
 <div class="field"><label>1人目現在月齢</label><input id="c1m" value="3" type="number"></div>
@@ -154,7 +179,7 @@
 </div>
 <script>
 const $=id=>document.getElementById(id), n=id=>Number($(id).value||0), man=x=>Math.round(x).toLocaleString()+'万円';
-const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryH','execSalaryW','wifeSocial','returnYear','wifeSalary','wifeGain','c1m','c2','c2gap','c3','c3gap','allowance','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
+const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryHBefore','execSalaryWBefore','execSalaryHAfter','execSalaryWAfter','wifeSocial','returnYear','wifeSalary','wifeGain','bonusH','bonusW','bonusMode','c1m','c2','c2gap','c3','c3gap','allowance','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
 function childAges(y){let a=n('c1m')/12+y,r=[a];if($('c2').value==='1'){r.push(a-n('c2gap'));if($('c3').value==='1')r.push(a-n('c2gap')-n('c3gap'));}return r}
 function childCost(a){if(a<0)return 0;if(a<3)return 2;if(a<6)return 3;if(a<12)return 4;if(a<18)return 6;if(a<23)return 10;return 0}
 function kids(y){return childAges(y).filter(a=>a>=0&&a<18).length}
@@ -204,46 +229,57 @@ function incomeTaxCalc(taxable){
   else if(taxable>=40000000)tax=taxable*.45-4796000;
   return Math.max(0,tax*1.021);
 }
-function rolePayCalc(grossMan,ageYears,social=true,spouseGrossMan=0,isHusband=false){
-  const grossY=grossMan*10000*12;
-  const hs=stdHealthSalary(grossMan)*10000;
-  const ps=stdPensionSalary(grossMan)*10000;
-  const healthRate=.1013/2;
-  const careRate=(ageYears>=40&&ageYears<65)?.0162/2:0;
-  const pensionRate=.183/2;
-  const health=social?hs*(healthRate+careRate)*12:0;
-  const pension=social?ps*pensionRate*12:0;
-  const salaryIncome=Math.max(0,grossY-salaryDeduction(grossY));
+function compCalc(grossMan,bonusMan,ageYears,social=true,spouseGrossAnnualYen=0,isHusband=false){
+  const monthlyGross=grossMan*10000,grossSalaryY=monthlyGross*12,bonusY=Math.max(0,bonusMan)*10000;
+  const totalGrossY=grossSalaryY+bonusY;
+  const hs=stdHealthSalary(grossMan)*10000,ps=stdPensionSalary(grossMan)*10000;
+  const healthRate=.1013/2,careRate=(ageYears>=40&&ageYears<65)?.0162/2:0,pensionRate=.183/2;
+  const monthlyHealth=social?hs*(healthRate+careRate)*12:0;
+  const monthlyPension=social?ps*pensionRate*12:0;
+  const stdBonus=Math.floor(bonusY/1000)*1000;
+  const bonusHealth=social?Math.min(stdBonus,5730000)*(healthRate+careRate):0;
+  const bonusPension=social?Math.min(stdBonus,1500000)*pensionRate:0;
+  const health=monthlyHealth+bonusHealth,pension=monthlyPension+bonusPension;
+  const salaryIncome=Math.max(0,totalGrossY-salaryDeduction(totalGrossY));
   let spouseDed=0;
   if(isHusband){
-    const spouseY=spouseGrossMan*10000*12;
-    const spouseIncome=Math.max(0,spouseY-salaryDeduction(spouseY));
+    const spouseIncome=Math.max(0,spouseGrossAnnualYen-salaryDeduction(spouseGrossAnnualYen));
     if(spouseIncome<=620000&&salaryIncome<=9000000)spouseDed=380000;
   }
   const taxable=salaryIncome-basicDeduction(salaryIncome)-health-pension-spouseDed;
   const incomeTax=incomeTaxCalc(taxable);
   const residentBase=Math.max(0,salaryIncome-430000-health-pension-(spouseDed?330000:0));
   const resident=residentBase>0?residentBase*.10+5000:0;
-  const netY=Math.max(0,grossY-health-pension-incomeTax-resident);
-  return {grossY,health,pension,incomeTax,resident,netY,netM:netY/12,hs,ps};
+  const netY=Math.max(0,totalGrossY-health-pension-incomeTax-resident);
+  return {grossSalaryY,bonusY,totalGrossY,health,pension,incomeTax,resident,netY,netM:netY/12};
 }
-function currentHouseholdPay(ageOverride=n('age')){
-  const h=rolePayCalc(n('execSalaryH'),ageOverride,true,n('execSalaryW'),true);
+function householdPay(returned=false,ageOverride=n('age')){
+  const hSalary=returned?n('execSalaryHAfter'):n('execSalaryHBefore');
+  const wSalary=returned?n('execSalaryWAfter'):n('execSalaryWBefore');
+  const bonusOn=$('bonusMode').value==='annual';
+  const bh=bonusOn?n('bonusH'):0,bw=bonusOn?n('bonusW'):0;
   const wifeSocial=$('wifeSocial').value==='join';
-  const w=rolePayCalc(n('execSalaryW'),ageOverride,wifeSocial,0,false);
-  return {h,w,houseNetM:(h.netM+w.netM)/10000};
+  const spouseGrossAnnual=(wSalary*12+bw)*10000;
+  const h=compCalc(hSalary,bh,ageOverride,true,spouseGrossAnnual,true);
+  const w=compCalc(wSalary,bw,ageOverride,wifeSocial,0,false);
+  return {h,w,houseNetY:h.netY+w.netY,houseNetM:(h.netY+w.netY)/12/10000};
 }
 function renderIncome(){
-  const r=currentHouseholdPay();
+  const before=householdPay(false,n('age')),after=householdPay(true,n('age')+n('returnYear'));
   const yen=v=>Math.round(v).toLocaleString('ja-JP')+'円';
-  $('houseNetBefore').textContent=(r.houseNetM).toFixed(2)+'万円';
-  $('houseNetAfter').textContent=(r.houseNetM+n('wifeGain')).toFixed(2)+'万円';
-  $('grossH').textContent=yen(r.h.grossY/12);$('grossW').textContent=yen(r.w.grossY/12);
-  $('healthH').textContent=yen(r.h.health/12);$('healthW').textContent=yen(r.w.health/12);
-  $('pensionH').textContent=yen(r.h.pension/12);$('pensionW').textContent=yen(r.w.pension/12);
-  $('incomeTaxH').textContent=yen(r.h.incomeTax/12);$('incomeTaxW').textContent=yen(r.w.incomeTax/12);
-  $('residentH').textContent=yen(r.h.resident/12);$('residentW').textContent=yen(r.w.resident/12);
-  $('netH').textContent=yen(r.h.netM);$('netW').textContent=yen(r.w.netM);
+  const manY=v=>(v/10000).toFixed(1)+'万円';
+  $('houseNetBefore').textContent=before.houseNetM.toFixed(2)+'万円';
+  $('houseNetAfter').textContent=(after.houseNetM+n('wifeGain')).toFixed(2)+'万円';
+  $('houseNetBeforeY').textContent=manY(before.houseNetY);
+  $('houseNetAfterY').textContent=manY(after.houseNetY+n('wifeGain')*10000*12);
+  for(const [tag,r] of [['Before',before],['After',after]]){
+    $('grossH'+tag).textContent=yen(r.h.grossSalaryY/12);$('grossW'+tag).textContent=yen(r.w.grossSalaryY/12);
+    $('bonusH'+tag).textContent=yen(r.h.bonusY);$('bonusW'+tag).textContent=yen(r.w.bonusY);
+    $('socialH'+tag).textContent=yen(r.h.health+r.h.pension);$('socialW'+tag).textContent=yen(r.w.health+r.w.pension);
+    $('incomeTaxH'+tag).textContent=yen(r.h.incomeTax);$('incomeTaxW'+tag).textContent=yen(r.w.incomeTax);
+    $('residentH'+tag).textContent=yen(r.h.resident);$('residentW'+tag).textContent=yen(r.w.resident);
+    $('netH'+tag).textContent=yen(r.h.netY);$('netW'+tag).textContent=yen(r.w.netY);
+  }
 }
 function events(){return [...document.querySelectorAll('.event')].map(r=>({name:r.querySelector('.en').value,y:Number(r.querySelector('.ey').value||0),amt:Number(r.querySelector('.ea').value||0)}))}
 function addEvent(e={name:'大型支出',y:5,amt:50}){let d=document.createElement('div');d.className='event';d.innerHTML='<div class="field"><label>名称</label><input class="en" value="'+e.name+'"></div><div class="field"><label>年後</label><input class="ey" type="number" value="'+e.y+'"></div><div class="field"><label>金額</label><input class="ea" type="number" value="'+e.amt+'"><span class="u">万円。収入はマイナス</span></div><button>削除</button>';d.querySelector('button').onclick=()=>{d.remove();calc()};d.querySelectorAll('input').forEach(x=>x.oninput=calc);$('events').appendChild(d)}
@@ -252,7 +288,7 @@ function sim(){
  for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent,income:0,livingCost:0,debtCost:0,lifestyleCost:0,savingCost:0,netCashflow:0,assetDraw:0});if(y===years)break;
   let returned=y>=n('returnYear'),living=baseLivingMonthly()*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=childAges(y).filter(a=>a>=18&&a<23).length*80/12,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
   const allowanceMonthly=kids(y)*n('allowance')/12;
-  const monthlyIncome=currentHouseholdPay(age+y).houseNetM+(returned?n('wifeGain'):0)+allowanceMonthly;
+  const monthlyIncome=householdPay(returned,age+y).houseNetM+(returned?n('wifeGain'):0)+allowanceMonthly;
   const monthlyNonSaving=living+cc+college+old+stu+mp+trav+free;
   const preSaveSurplus=monthlyIncome-monthlyNonSaving;
 
@@ -352,7 +388,13 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelect
 
 const BASE_VALUES=Object.fromEntries(ids.map(id=>[id,$(id).value]));
 function snapshot(){return {v:Object.fromEntries(ids.map(id=>[id,$(id).value])),e:events()}}
-function applySnap(d){Object.entries(d.v||{}).forEach(([k,v])=>{if($(k))$(k).value=v});$('events').innerHTML='';(d.e||[]).forEach(addEvent)}
+function applySnap(d){
+  const v={...(d.v||{})};
+  if(v.execSalaryH!=null&&v.execSalaryHBefore==null){v.execSalaryHBefore=v.execSalaryH;v.execSalaryHAfter=v.execSalaryH}
+  if(v.execSalaryW!=null&&v.execSalaryWBefore==null){v.execSalaryWBefore=v.execSalaryW;v.execSalaryWAfter=v.execSalaryW}
+  Object.entries(v).forEach(([k,val])=>{if($(k))$(k).value=val});
+  $('events').innerHTML='';(d.e||[]).forEach(addEvent)
+}
 function scenarioStore(){try{return JSON.parse(localStorage.getItem('lifeSimScenariosV2')||'null')}catch{return null}}
 let store=scenarioStore();
 if(!store){
