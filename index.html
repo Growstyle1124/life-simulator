@@ -3,7 +3,7 @@
 <title>人生・資産形成シミュレーター</title>
 <style>
 :root{--bg:#0b0e14;--p:#121722;--p2:#171e2c;--t:#eef2f7;--m:#9aa6b2;--l:#293243;--a:#6ea8fe;--g:#7bd89b;--y:#f1c75b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.w{max-width:1180px;margin:auto;padding:18px}.sub,.u,.muted{color:var(--m);font-size:12px}.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:15px}.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0}.metric{background:var(--p2);border:1px solid var(--l);border-radius:13px;padding:12px}.metric b{display:block;font-size:21px;margin-top:4px}.field{display:flex;flex-direction:column;gap:4px}label{font-size:12px;color:var(--m)}input,select,button{background:#0f1520;color:var(--t);border:1px solid var(--l);border-radius:9px;padding:9px;font-size:16px}button{cursor:pointer}.primary{background:var(--a);color:#08111c;font-weight:700}.tabs,.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab.active{background:var(--a);color:#08111c}.sec{display:none}.sec.active{display:block}canvas{width:100%;height:320px;background:#0d131d;border:1px solid var(--l);border-radius:12px}.status{background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:9px;margin-top:7px;font-size:13px}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:8px;text-align:right}td:first-child,th:first-child{text-align:left}.scroll{overflow:auto}.note{padding:10px;border-radius:10px;background:#101827;color:var(--m);font-size:12px;margin-top:10px}.budgetTotal{margin-top:10px;padding:10px;border:1px solid var(--l);border-radius:10px;background:var(--p2);font-weight:700}.event{display:grid;grid-template-columns:1.2fr .7fr .8fr auto;gap:7px;margin:8px 0;align-items:end}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.w{max-width:1180px;margin:auto;padding:18px}.sub,.u,.muted{color:var(--m);font-size:12px}.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:15px}.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0}.metric{background:var(--p2);border:1px solid var(--l);border-radius:13px;padding:12px}.metric b{display:block;font-size:21px;margin-top:4px}.field{display:flex;flex-direction:column;gap:4px}label{font-size:12px;color:var(--m)}input,select,button{background:#0f1520;color:var(--t);border:1px solid var(--l);border-radius:9px;padding:9px;font-size:16px}button{cursor:pointer}.primary{background:var(--a);color:#08111c;font-weight:700}.tabs,.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab.active{background:var(--a);color:#08111c}.sec{display:none}.sec.active{display:block}canvas{width:100%;height:320px;background:#0d131d;border:1px solid var(--l);border-radius:12px}.chartWrap{position:relative}.chartTip{position:absolute;display:none;pointer-events:none;min-width:170px;background:#090d14;border:1px solid var(--l);border-radius:10px;padding:9px 10px;font-size:12px;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:5}.chartTip b{font-size:13px}.chartTip .tipRow{display:flex;justify-content:space-between;gap:12px;margin-top:3px}.chartTip .blue{color:#8fd3ff}.chartTip .green{color:#90be6d}.chartTip .yellow{color:#f1c75b}.status{background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:9px;margin-top:7px;font-size:13px}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:8px;text-align:right}td:first-child,th:first-child{text-align:left}.scroll{overflow:auto}.note{padding:10px;border-radius:10px;background:#101827;color:var(--m);font-size:12px;margin-top:10px}.budgetTotal{margin-top:10px;padding:10px;border:1px solid var(--l);border-radius:10px;background:var(--p2);font-weight:700}.event{display:grid;grid-template-columns:1.2fr .7fr .8fr auto;gap:7px;margin:8px 0;align-items:end}
 .scenarioBox{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:12px;margin:12px 0}.scenarioHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.scenarioList{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.scenarioChip{display:flex;align-items:center;gap:6px;background:var(--p2);border:1px solid var(--l);border-radius:999px;padding:5px 9px}.scenarioChip.active{border-color:var(--a);box-shadow:0 0 0 1px var(--a) inset}.scenarioChip button{padding:4px 8px;border-radius:999px;font-size:12px}.scenarioActions{display:flex;gap:6px;flex-wrap:wrap}.compareChecks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.compareChecks label{display:flex;align-items:center;gap:5px;border:1px solid var(--l);border-radius:9px;padding:6px 8px;background:#0f1520}.compareChecks input{width:auto}.compareTable th,.compareTable td{text-align:right}.compareTable th:first-child,.compareTable td:first-child{text-align:left}@media(max-width:760px){.g2,.g3,.sum{grid-template-columns:1fr 1fr}.event{grid-template-columns:1fr 1fr}}@media(max-width:520px){.g2,.g3,.sum,.event{grid-template-columns:1fr}.w{padding:10px}}
 </style></head><body><div class="w">
 <h1 style="margin:0">人生・資産形成シミュレーター</h1><div class="sub">お金に追われず、好きだから働ける状態をつくるための家計シミュレーター</div>
@@ -126,7 +126,7 @@
 </div></section>
 
 <section class="sec" id="result"><div class="grid g2">
-<div class="card"><h2>資産推移</h2><canvas id="chart" width="900" height="320"></canvas><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済</div></div>
+<div class="card"><h2>資産推移</h2><div class="chartWrap"><canvas id="chart" width="900" height="320"></canvas><div id="chartTip" class="chartTip"></div></div><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済。カーソルを合わせるか、スマホではタップすると詳細が見られます。</div></div>
 <div class="card"><h2>経済的自由度</h2><div id="freedom"></div></div>
 <div class="card" style="grid-column:1/-1"><h2>世帯収支の推移</h2><div class="muted">各年の収入・支出・積立を年額で表示します。NISA・iDeCo・小規模企業共済・現金の「基本積立」は先取りで維持し、収入で足りない場合は現金等を取り崩す計算です。自動増額分は余裕がある場合のみ追加します。</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>年齢</th><th>世帯収入</th><th>生活・子育て</th><th>返済</th><th>旅行・自由費</th><th>投資・貯蓄</th><th>積立後収支</th><th>資産取崩し</th></tr></thead><tbody id="cashflowTable"></tbody></table></div></div>
 <div class="card"><h2>節目</h2><div class="scroll"><table><thead><tr><th>年齢</th><th>総資産</th><th>流動</th><th>拘束</th></tr></thead><tbody id="milestones"></tbody></table></div></div>
@@ -199,7 +199,45 @@ function sim(){
   if(cash<0){nisa+=cash;cash=0}if(nisa<0){tax+=nisa;nisa=0}if(tax<0){loan+=tax;tax=0}if(loan<0)loan=0;
  } return out
 }
-function draw(r){let c=$('chart'),x=c.getContext('2d'),W=c.width,H=c.height,p={l:55,r:18,t:20,b:35},max=Math.max(...r.map(v=>v.total),1)*1.08,X=i=>p.l+(W-p.l-p.r)*i/(r.length-1),Y=v=>H-p.b-(H-p.t-p.b)*v/max;x.clearRect(0,0,W,H);x.font='12px sans-serif';for(let i=0;i<=4;i++){let v=max*i/4,y=Y(v);x.strokeStyle='#293243';x.beginPath();x.moveTo(p.l,y);x.lineTo(W-p.r,y);x.stroke();x.fillStyle='#9aa6b2';x.fillText(Math.round(v)+'万',5,y+4)}function line(k,col){x.beginPath();r.forEach((v,i)=>i?x.lineTo(X(i),Y(v[k])):x.moveTo(X(i),Y(v[k])));x.strokeStyle=col;x.lineWidth=2.5;x.stroke()}line('total','#8fd3ff');line('liquid','#90be6d');line('locked','#f1c75b')}
+let chartState={rows:[],pad:{l:55,r:18,t:20,b:35},max:1,selected:null};
+function draw(r,selectedIndex=chartState.selected){
+  chartState.rows=r;chartState.selected=selectedIndex;
+  let c=$('chart'),x=c.getContext('2d'),W=c.width,H=c.height,p=chartState.pad,max=Math.max(...r.map(v=>v.total),1)*1.08;
+  chartState.max=max;
+  const X=i=>p.l+(W-p.l-p.r)*i/(Math.max(1,r.length-1)),Y=v=>H-p.b-(H-p.t-p.b)*v/max;
+  x.clearRect(0,0,W,H);x.font='12px sans-serif';
+  for(let i=0;i<=4;i++){let v=max*i/4,y=Y(v);x.strokeStyle='#293243';x.lineWidth=1;x.beginPath();x.moveTo(p.l,y);x.lineTo(W-p.r,y);x.stroke();x.fillStyle='#9aa6b2';x.fillText(Math.round(v)+'万',5,y+4)}
+  function line(k,col){x.beginPath();r.forEach((v,i)=>i?x.lineTo(X(i),Y(v[k])):x.moveTo(X(i),Y(v[k])));x.strokeStyle=col;x.lineWidth=2.5;x.stroke()}
+  line('total','#8fd3ff');line('liquid','#90be6d');line('locked','#f1c75b');
+  if(selectedIndex!=null&&r[selectedIndex]){
+    const row=r[selectedIndex],xx=X(selectedIndex);
+    x.strokeStyle='#c9d2df';x.lineWidth=1;x.setLineDash([4,4]);x.beginPath();x.moveTo(xx,p.t);x.lineTo(xx,H-p.b);x.stroke();x.setLineDash([]);
+    [['total','#8fd3ff'],['liquid','#90be6d'],['locked','#f1c75b']].forEach(([k,col])=>{x.fillStyle=col;x.beginPath();x.arc(xx,Y(row[k]),4.5,0,Math.PI*2);x.fill();x.strokeStyle='#0b0e14';x.lineWidth=2;x.stroke()});
+  }
+}
+function chartIndexFromEvent(e){
+  const c=$('chart'),rect=c.getBoundingClientRect(),p=chartState.pad,W=c.width;
+  const clientX=e.touches&&e.touches[0]?e.touches[0].clientX:e.clientX;
+  const px=(clientX-rect.left)*(c.width/rect.width);
+  const usable=W-p.l-p.r;
+  let idx=Math.round(((px-p.l)/usable)*Math.max(1,chartState.rows.length-1));
+  return Math.max(0,Math.min(chartState.rows.length-1,idx));
+}
+function showChartTip(e,idx,persist=false){
+  const row=chartState.rows[idx];if(!row)return;
+  chartState.selected=idx;draw(chartState.rows,idx);
+  const tip=$('chartTip'),wrap=tip.parentElement,rect=wrap.getBoundingClientRect();
+  const clientX=e.touches&&e.touches[0]?e.touches[0].clientX:e.clientX;
+  const clientY=e.touches&&e.touches[0]?e.touches[0].clientY:e.clientY;
+  tip.innerHTML='<b>'+row.age+'歳</b><div class="tipRow"><span class="blue">総資産</span><strong>'+man(row.total)+'</strong></div><div class="tipRow"><span class="green">流動資産</span><strong>'+man(row.liquid)+'</strong></div><div class="tipRow"><span class="yellow">iDeCo・共済</span><strong>'+man(row.locked)+'</strong></div>';
+  tip.style.display='block';
+  const tw=190,th=100;
+  let left=clientX-rect.left+12,top=clientY-rect.top+12;
+  if(left+tw>rect.width)left=Math.max(4,clientX-rect.left-tw-12);
+  if(top+th>rect.height)top=Math.max(4,clientY-rect.top-th-12);
+  tip.style.left=left+'px';tip.style.top=top+'px';
+  if(persist)tip.dataset.persist='1';else delete tip.dataset.persist;
+}
 function renderCashflow(r){
   const drawYears=r.filter(x=>x.assetDraw>0.1);
   const warn=drawYears.length?'<div class="status" style="border-color:#6e5a22;color:#f1c75b"><b>注意：</b>基本積立を維持するため、'+drawYears[0].age+'歳ごろから一部の年で資産取り崩しが発生しています。生活費の定義や積立額を調整すると確認しやすくなります。</div>':'';
@@ -278,5 +316,10 @@ function renderCompare(){
 $('export').onclick=()=>{saveCurrent(true);let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({version:2,store},null,2)],{type:'application/json'}));a.download='life-simulator-scenarios.json';a.click()};
 $('import').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader;r.onload=()=>{try{let d=JSON.parse(r.result);if(d.store&&Array.isArray(d.store.items)){store=d.store}else if(d.v){store={current:0,items:[{name:'読み込み',v:d.v,e:d.e||[]}],compare:[0]}}else throw new Error();persist();applySnap(store.items[store.current]);renderScenarioUI();calc();renderCompare()}catch{alert('読み込み失敗')}};r.readAsText(f)};
 
+const chartEl=$('chart'),chartTip=$('chartTip');
+chartEl.addEventListener('mousemove',e=>showChartTip(e,chartIndexFromEvent(e),false));
+chartEl.addEventListener('mouseleave',()=>{if(chartTip.dataset.persist!=='1'){chartTip.style.display='none';chartState.selected=null;draw(chartState.rows,null)}});
+chartEl.addEventListener('click',e=>showChartTip(e,chartIndexFromEvent(e),true));
+chartEl.addEventListener('touchstart',e=>{if(e.touches&&e.touches.length)showChartTip(e,chartIndexFromEvent(e),true)},{passive:true});
 applySnap(store.items[store.current]);renderScenarioUI();calc();renderCompare();
 </script></body></html>
