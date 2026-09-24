@@ -171,7 +171,7 @@
 </div></section>
 
 <section class="sec" id="result"><div class="grid g2">
-<div class="card"><h2>資産推移</h2><div class="chartWrap"><canvas id="chart" width="900" height="320"></canvas><div id="chartTip" class="chartTip"></div></div><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済。カーソルを合わせるか、スマホではタップすると詳細が見られます。</div></div>
+<div class="card"><h2>資産推移</h2><div class="chartWrap"><canvas id="chart" width="900" height="320"></canvas><div id="chartTip" class="chartTip"></div></div><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済 / 紫:NISA / 白:現金。カーソルを合わせるか、スマホではタップすると詳細が見られます。</div></div>
 <div class="card"><h2>経済的自由度</h2><div id="freedom"></div></div>
 <div class="card" style="grid-column:1/-1"><h2>世帯収支の推移</h2><div class="muted">各年の収入・支出・積立を年額で表示します。NISA・iDeCo・小規模企業共済・現金の「基本積立」は先取りで維持し、収入で足りない場合は現金等を取り崩す計算です。自動増額分は余裕がある場合のみ追加します。</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>年齢</th><th>世帯収入</th><th>生活・子育て</th><th>返済</th><th>旅行・自由費</th><th>投資・貯蓄</th><th>積立後収支</th><th>資産取崩し</th></tr></thead><tbody id="cashflowTable"></tbody></table></div></div>
 <div class="card"><h2>節目</h2><div class="scroll"><table><thead><tr><th>年齢</th><th>総資産</th><th>流動</th><th>拘束</th></tr></thead><tbody id="milestones"></tbody></table></div></div>
@@ -356,11 +356,11 @@ function draw(r,selectedIndex=chartState.selected){
   x.clearRect(0,0,W,H);x.font='12px sans-serif';
   for(let i=0;i<=4;i++){let v=max*i/4,y=Y(v);x.strokeStyle='#293243';x.lineWidth=1;x.beginPath();x.moveTo(p.l,y);x.lineTo(W-p.r,y);x.stroke();x.fillStyle='#9aa6b2';x.fillText(Math.round(v)+'万',5,y+4)}
   function line(k,col){x.beginPath();r.forEach((v,i)=>i?x.lineTo(X(i),Y(v[k])):x.moveTo(X(i),Y(v[k])));x.strokeStyle=col;x.lineWidth=2.5;x.stroke()}
-  line('total','#8fd3ff');line('liquid','#90be6d');line('locked','#f1c75b');
+  line('total','#8fd3ff');line('liquid','#90be6d');line('locked','#f1c75b');line('nisa','#b78cff');line('cash','#f3f6fa');
   if(selectedIndex!=null&&r[selectedIndex]){
     const row=r[selectedIndex],xx=X(selectedIndex);
     x.strokeStyle='#c9d2df';x.lineWidth=1;x.setLineDash([4,4]);x.beginPath();x.moveTo(xx,p.t);x.lineTo(xx,H-p.b);x.stroke();x.setLineDash([]);
-    [['total','#8fd3ff'],['liquid','#90be6d'],['locked','#f1c75b']].forEach(([k,col])=>{x.fillStyle=col;x.beginPath();x.arc(xx,Y(row[k]),4.5,0,Math.PI*2);x.fill();x.strokeStyle='#0b0e14';x.lineWidth=2;x.stroke()});
+    [['total','#8fd3ff'],['liquid','#90be6d'],['locked','#f1c75b'],['nisa','#b78cff'],['cash','#f3f6fa']].forEach(([k,col])=>{x.fillStyle=col;x.beginPath();x.arc(xx,Y(row[k]),4.5,0,Math.PI*2);x.fill();x.strokeStyle='#0b0e14';x.lineWidth=2;x.stroke()});
   }
 }
 function chartIndexFromEvent(e){
@@ -377,9 +377,9 @@ function showChartTip(e,idx,persist=false){
   const tip=$('chartTip'),wrap=tip.parentElement,rect=wrap.getBoundingClientRect();
   const clientX=e.touches&&e.touches[0]?e.touches[0].clientX:e.clientX;
   const clientY=e.touches&&e.touches[0]?e.touches[0].clientY:e.clientY;
-  tip.innerHTML='<b>'+row.age+'歳</b><div class="tipRow"><span class="blue">総資産</span><strong>'+man(row.total)+'</strong></div><div class="tipRow"><span class="green">流動資産</span><strong>'+man(row.liquid)+'</strong></div><div class="tipRow"><span class="yellow">iDeCo・共済</span><strong>'+man(row.locked)+'</strong></div>';
+  tip.innerHTML='<b>'+row.age+'歳</b><div class="tipRow"><span class="blue">総資産</span><strong>'+man(row.total)+'</strong></div><div class="tipRow"><span class="green">流動資産</span><strong>'+man(row.liquid)+'</strong></div><div class="tipRow"><span class="purple">NISA</span><strong>'+man(row.nisa)+'</strong></div><div class="tipRow"><span class="white">現金</span><strong>'+man(row.cash)+'</strong></div><div class="tipRow"><span class="yellow">iDeCo・共済</span><strong>'+man(row.locked)+'</strong></div>';
   tip.style.display='block';
-  const tw=190,th=100;
+  const tw=200,th=145;
   let left=clientX-rect.left+12,top=clientY-rect.top+12;
   if(left+tw>rect.width)left=Math.max(4,clientX-rect.left-tw-12);
   if(top+th>rect.height)top=Math.max(4,clientY-rect.top-th-12);
