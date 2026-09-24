@@ -303,34 +303,78 @@ function sim(){
   const monthlyNonSaving=living+cc+college+old+stu+mp+trav+free;
   const preSaveSurplus=monthlyIncome-monthlyNonSaving;
 
-  // 基本積立は「先取り固定」。家計収支が厳しくても自動で0円にしない。
-  let cm=n('cashM'),nm=n('nisaM'),im=n('idecoM'),km=n('kyosaiM');
+  // 現金バッファを優先維持する。
+  // iDeCo・共済は基本維持、NISAは家計余力に応じて調整する。
+  const buffer=n('buffer');
+  let cm=n('cashM'),baseNisa=n('nisaM'),nm=baseNisa,im=n('idecoM'),km=n('kyosaiM');
   if($('allowance')) nm+=allowanceMonthly;
 
-  const basePlanned=cm+nm+im+km;
-  let room=Math.max(0,preSaveSurplus-basePlanned);
-
-  // 自動増額は余裕資金の範囲内だけで実施する。
+  // 自動増額は余裕がある場合のみ。
   let desiredNisa=0,desiredIdeco=0,desiredKyosai=0;
-  if(cash>=n('buffer')) desiredNisa+=n('nisaBoost');
+  if(cash>=buffer) desiredNisa+=n('nisaBoost');
   if(returned){
     desiredNisa+=n('nisaReturn');
     desiredIdeco=Math.max(0,n('idecoReturn')-im);
     desiredKyosai=Math.max(0,n('kyosaiReturn')-km);
   }
-  const autoDesired=desiredNisa+desiredIdeco+desiredKyosai;
-  const autoScale=autoDesired>0?Math.min(1,room/autoDesired):0;
-  nm+=desiredNisa*autoScale;
-  im+=desiredIdeco*autoScale;
-  km+=desiredKyosai*autoScale;
-  room-=autoDesired*autoScale;
 
-  // 基本積立と自動増額をしても余る場合、現金バッファ未達なら現金、それ以外はNISAへ。
-  if(room>0){if(cash<n('buffer'))cm+=room;else nm+=room}
+  // まずiDeCo・共済・現金積立・基本NISAを置く。
+  let plannedBase=cm+nm+im+km;
+  let room=preSaveSurplus-plannedBase;
 
-  const planned=cm+nm+im+km;
-  const shortage=Math.max(0,planned-preSaveSurplus);
-  const cashDraw=Math.max(0,shortage);
+  // 赤字なら、まず基本NISAから減らして現金バッファを守る。
+  if(room<0){
+    const reducibleBaseNisa=Math.max(0,nm-allowanceMonthly); // 児童手当分はNISA継続
+    const cut=Math.min(reducibleBaseNisa,-room);
+    nm-=cut; room+=cut;
+  }
+
+  // それでも赤字なら、現金積立を止める。
+  if(room<0){
+    const cut=Math.min(cm,-room);
+    cm-=cut; room+=cut;
+  }
+
+  // 余裕があれば自動増額を追加。
+  if(room>0){
+    const autoDesired=desiredNisa+desiredIdeco+desiredKyosai;
+    const autoScale=autoDesired>0?Math.min(1,room/autoDesired):0;
+    nm+=desiredNisa*autoScale;
+    im+=desiredIdeco*autoScale;
+    km+=desiredKyosai*autoScale;
+    room-=autoDesired*autoScale;
+  }
+
+  // 現金バッファ未達なら余剰は現金へ、達成後はNISAへ。
+  if(room>0){
+    if(cash<buffer) cm+=room;
+    else nm+=room;
+    room=0;
+  }
+
+  let planned=cm+nm+im+km;
+  let shortage=Math.max(0,planned-preSaveSurplus);
+
+  // 現金は原則バッファまで守る。必要ならNISAをさらに減らす。
+  if(shortage>0){
+    const projectedCash=cash+(cm-shortage)*12;
+    if(projectedCash<buffer){
+      const maxNisaCut=Math.max(0,nm-allowanceMonthly);
+      const needProtect=(buffer-projectedCash)/12;
+      const cut=Math.min(maxNisaCut,Math.max(shortage,needProtect));
+      nm-=cut;
+      planned=cm+nm+im+km;
+      shortage=Math.max(0,planned-preSaveSurplus);
+    }
+  }
+
+  // 最終的に不足する場合のみ現金を取り崩す。
+  const availableCashDraw=Math.max(0,(cash-buffer)/12);
+  const cashDraw=Math.min(shortage,availableCashDraw);
+  const remainingShortage=Math.max(0,shortage-cashDraw);
+
+  // バッファを割ってなお不足する場合は、NISA取り崩しへ回すため別管理。
+  const forcedDraw=remainingShortage;
 
   const allowanceAnnual=allowanceMonthly*12;
   const incomeAnnual=monthlyIncome*12;
@@ -339,8 +383,8 @@ function sim(){
   const lifestyleAnnual=(trav+free)*12;
   const savingAnnual=planned*12;
   const netAnnual=incomeAnnual-livingAnnual-debtAnnual-lifestyleAnnual-savingAnnual;
-  Object.assign(out[out.length-1],{income:incomeAnnual,livingCost:livingAnnual,debtCost:debtAnnual,lifestyleCost:lifestyleAnnual,savingCost:savingAnnual,netCashflow:netAnnual,assetDraw:cashDraw*12});
-  for(let m=0;m<12;m++){tax*=1+rs;nisa=nisa*(1+rs)+nm;ideco=ideco*(1+ri)+im;btc*=1+rb;k=k*(1+rk)+km;cash+=cm-cashDraw;spent+=trav+free;if(mom>0)mom=Math.max(0,mom-mp)}
+  Object.assign(out[out.length-1],{income:incomeAnnual,livingCost:livingAnnual,debtCost:debtAnnual,lifestyleCost:lifestyleAnnual,savingCost:savingAnnual,netCashflow:netAnnual,assetDraw:(cashDraw+forcedDraw)*12});
+  for(let m=0;m<12;m++){tax*=1+rs;nisa=nisa*(1+rs)+nm-forcedDraw;ideco=ideco*(1+ri)+im;btc*=1+rb;k=k*(1+rk)+km;cash+=cm-cashDraw;spent+=trav+free;if(mom>0)mom=Math.max(0,mom-mp)}
   if(Math.round(y+1)===Math.round(n('carY'))){cash-=Math.max(0,n('carBuy')-n('carSell'))}
   if(n('kominka')>0&&Math.round(y+1)===Math.round(n('kominkaY')))cash-=n('kominka');
   ev.filter(e=>Math.round(e.y)===Math.round(y+1)).forEach(e=>cash-=e.amt);
@@ -388,7 +432,7 @@ function showChartTip(e,idx,persist=false){
 }
 function renderCashflow(r){
   const drawYears=r.filter(x=>x.assetDraw>0.1);
-  const warn=drawYears.length?'<div class="status" style="border-color:#6e5a22;color:#f1c75b"><b>注意：</b>基本積立を維持するため、'+drawYears[0].age+'歳ごろから一部の年で資産取り崩しが発生しています。生活費の定義や積立額を調整すると確認しやすくなります。</div>':'';
+  const warn=drawYears.length?'<div class="status" style="border-color:#6e5a22;color:#f1c75b"><b>注意：</b>現金バッファを守りながら家計を維持するため、'+drawYears[0].age+'歳ごろから一部の年で資産取り崩しが発生しています。生活費の定義や積立額を調整すると確認しやすくなります。</div>':'';
   if($('freedom')&&!$('cashflowWarn')){let d=document.createElement('div');d.id='cashflowWarn';$('freedom').prepend(d)}
   if($('cashflowWarn'))$('cashflowWarn').innerHTML=warn;
   const ages=[n('age'),35,40,45,50,55,60,65,70,75].filter((a,i,arr)=>a>=n('age')&&arr.indexOf(a)===i);
