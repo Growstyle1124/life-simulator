@@ -3,10 +3,24 @@
 <title>人生・資産形成シミュレーター</title>
 <style>
 :root{--bg:#0b0e14;--p:#121722;--p2:#171e2c;--t:#eef2f7;--m:#9aa6b2;--l:#293243;--a:#6ea8fe;--g:#7bd89b;--y:#f1c75b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.w{max-width:1180px;margin:auto;padding:18px}.sub,.u,.muted{color:var(--m);font-size:12px}.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:15px}.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0}.metric{background:var(--p2);border:1px solid var(--l);border-radius:13px;padding:12px}.metric b{display:block;font-size:21px;margin-top:4px}.field{display:flex;flex-direction:column;gap:4px}label{font-size:12px;color:var(--m)}input,select,button{background:#0f1520;color:var(--t);border:1px solid var(--l);border-radius:9px;padding:9px;font-size:16px}button{cursor:pointer}.primary{background:var(--a);color:#08111c;font-weight:700}.tabs,.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab.active{background:var(--a);color:#08111c}.sec{display:none}.sec.active{display:block}canvas{width:100%;height:320px;background:#0d131d;border:1px solid var(--l);border-radius:12px}.status{background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:9px;margin-top:7px;font-size:13px}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:8px;text-align:right}td:first-child,th:first-child{text-align:left}.scroll{overflow:auto}.note{padding:10px;border-radius:10px;background:#101827;color:var(--m);font-size:12px;margin-top:10px}.event{display:grid;grid-template-columns:1.2fr .7fr .8fr auto;gap:7px;margin:8px 0;align-items:end}@media(max-width:760px){.g2,.g3,.sum{grid-template-columns:1fr 1fr}.event{grid-template-columns:1fr 1fr}}@media(max-width:520px){.g2,.g3,.sum,.event{grid-template-columns:1fr}.w{padding:10px}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.w{max-width:1180px;margin:auto;padding:18px}.sub,.u,.muted{color:var(--m);font-size:12px}.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:15px}.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0}.metric{background:var(--p2);border:1px solid var(--l);border-radius:13px;padding:12px}.metric b{display:block;font-size:21px;margin-top:4px}.field{display:flex;flex-direction:column;gap:4px}label{font-size:12px;color:var(--m)}input,select,button{background:#0f1520;color:var(--t);border:1px solid var(--l);border-radius:9px;padding:9px;font-size:16px}button{cursor:pointer}.primary{background:var(--a);color:#08111c;font-weight:700}.tabs,.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab.active{background:var(--a);color:#08111c}.sec{display:none}.sec.active{display:block}canvas{width:100%;height:320px;background:#0d131d;border:1px solid var(--l);border-radius:12px}.status{background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:9px;margin-top:7px;font-size:13px}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:8px;text-align:right}td:first-child,th:first-child{text-align:left}.scroll{overflow:auto}.note{padding:10px;border-radius:10px;background:#101827;color:var(--m);font-size:12px;margin-top:10px}.event{display:grid;grid-template-columns:1.2fr .7fr .8fr auto;gap:7px;margin:8px 0;align-items:end}
+.scenarioBox{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:12px;margin:12px 0}.scenarioHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.scenarioList{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.scenarioChip{display:flex;align-items:center;gap:6px;background:var(--p2);border:1px solid var(--l);border-radius:999px;padding:5px 9px}.scenarioChip.active{border-color:var(--a);box-shadow:0 0 0 1px var(--a) inset}.scenarioChip button{padding:4px 8px;border-radius:999px;font-size:12px}.scenarioActions{display:flex;gap:6px;flex-wrap:wrap}.compareChecks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.compareChecks label{display:flex;align-items:center;gap:5px;border:1px solid var(--l);border-radius:9px;padding:6px 8px;background:#0f1520}.compareChecks input{width:auto}.compareTable th,.compareTable td{text-align:right}.compareTable th:first-child,.compareTable td:first-child{text-align:left}@media(max-width:760px){.g2,.g3,.sum{grid-template-columns:1fr 1fr}.event{grid-template-columns:1fr 1fr}}@media(max-width:520px){.g2,.g3,.sum,.event{grid-template-columns:1fr}.w{padding:10px}}
 </style></head><body><div class="w">
 <h1 style="margin:0">人生・資産形成シミュレーター</h1><div class="sub">お金に追われず、好きだから働ける状態をつくるための家計シミュレーター</div>
 <div class="bar"><button class="primary" id="calc">再計算</button><button id="save">この端末に保存</button><button id="export">設定を書き出す</button><label style="border:1px solid var(--l);border-radius:9px;padding:9px;cursor:pointer">設定を読み込む<input id="import" type="file" accept=".json" hidden></label></div>
+<div class="scenarioBox">
+    <div class="scenarioHead">
+      <div><b>シナリオ</b><div class="muted">条件違いを保存して、複数パターンを比較できます。</div></div>
+      <div class="scenarioActions">
+        <button id="newScenario">＋新規</button>
+        <button id="dupScenario">複製</button>
+        <button id="renameScenario">名前変更</button>
+        <button id="deleteScenario">削除</button>
+      </div>
+    </div>
+    <div class="scenarioList" id="scenarioList"></div>
+    <div class="compareChecks" id="compareChecks"></div>
+  </div>
 <div class="sum"><div class="metric"><span class="muted">現在総資産</span><b id="s0">-</b></div><div class="metric"><span class="muted">現金</span><b id="sc">-</b></div><div class="metric"><span class="muted">10年後</span><b id="s10">-</b></div><div class="metric"><span class="muted">60歳</span><b id="s60">-</b></div><div class="metric"><span class="muted">旅行・自由費累計</span><b id="sspend">-</b></div></div>
 <div class="tabs"><button class="tab active" data-t="base">基本</button><button class="tab" data-t="family">家族・収入</button><button class="tab" data-t="invest">資産形成</button><button class="tab" data-t="debt">返済・イベント</button><button class="tab" data-t="result">結果</button></div>
 
@@ -97,6 +111,7 @@
 <div class="card"><h2>経済的自由度</h2><div id="freedom"></div></div>
 <div class="card"><h2>節目</h2><div class="scroll"><table><thead><tr><th>年齢</th><th>総資産</th><th>流動</th><th>拘束</th></tr></thead><tbody id="milestones"></tbody></table></div></div>
 <div class="card"><h2>75歳時点内訳</h2><div class="scroll"><table><tbody id="breakdown"></tbody></table></div></div>
+<div class="card" style="grid-column:1/-1"><h2>シナリオ比較</h2><div class="muted">上部で比較したいシナリオにチェックを入れてください（最大4件推奨）。</div><div class="scroll" style="margin-top:8px"><table class="compareTable"><thead id="compareHead"></thead><tbody id="compareBody"></tbody></table></div></div>
 </div></section>
 <div class="note">これは家計設計用の概算です。税・社会保険・児童手当・年金・投資収益・Bitcoin・共済の将来額を保証するものではありません。</div>
 </div>
@@ -128,10 +143,68 @@ function sim(){
 }
 function draw(r){let c=$('chart'),x=c.getContext('2d'),W=c.width,H=c.height,p={l:55,r:18,t:20,b:35},max=Math.max(...r.map(v=>v.total),1)*1.08,X=i=>p.l+(W-p.l-p.r)*i/(r.length-1),Y=v=>H-p.b-(H-p.t-p.b)*v/max;x.clearRect(0,0,W,H);x.font='12px sans-serif';for(let i=0;i<=4;i++){let v=max*i/4,y=Y(v);x.strokeStyle='#293243';x.beginPath();x.moveTo(p.l,y);x.lineTo(W-p.r,y);x.stroke();x.fillStyle='#9aa6b2';x.fillText(Math.round(v)+'万',5,y+4)}function line(k,col){x.beginPath();r.forEach((v,i)=>i?x.lineTo(X(i),Y(v[k])):x.moveTo(X(i),Y(v[k])));x.strokeStyle=col;x.lineWidth=2.5;x.stroke()}line('total','#8fd3ff');line('liquid','#90be6d');line('locked','#f1c75b')}
 function calc(){let r=sim(),now=r[0],ten=r.find(x=>x.y===10)||r.at(-1),sixty=r.find(x=>x.age===60)||r.at(-1),last=r.at(-1);$('s0').textContent=man(now.total);$('sc').textContent=man(now.cash);$('s10').textContent=man(ten.total);$('s60').textContent=man(sixty.total);$('sspend').textContent=man(last.spent);$('milestones').innerHTML=[35,40,45,50,55,60,65,70,75].filter(a=>a>=n('age')).map(a=>{let q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');$('breakdown').innerHTML=[['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k],['母への残債',-last.mom]].map(a=>'<tr><td>'+a[0]+'</td><td>'+man(a[1])+'</td></tr>').join('');$('freedom').innerHTML=[40,45,50,55,60].map(a=>{let q=r.find(x=>x.age===a);if(!q)return'';let ml=n('living')*Math.pow(1+n('infl')/100,a-n('age')),yc=q.liquid/(ml*12);return '<div class="status"><b>'+a+'歳</b>：流動資産 '+man(q.liquid)+' ／ 生活費約 '+yc.toFixed(1)+'年分</div>'}).join('')+'<div class="status">目標は仕事を辞めることではなく、<b>お金に困らず好きだから働ける状態</b>。</div>';draw(r)}
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.t).classList.add('active');calc()});ids.forEach(id=>$(id).oninput=calc);$('calc').onclick=calc;$('addEvent').onclick=()=>addEvent();
-$('save').onclick=()=>{localStorage.setItem('lifeSim',JSON.stringify({v:Object.fromEntries(ids.map(id=>[id,$(id).value])),e:events()}));alert('この端末に保存しました')};
-let saved=localStorage.getItem('lifeSim');if(saved){try{let d=JSON.parse(saved);Object.entries(d.v||{}).forEach(([k,v])=>{if($(k))$(k).value=v});(d.e||[]).forEach(addEvent)}catch{}}
-$('export').onclick=()=>{let d={v:Object.fromEntries(ids.map(id=>[id,$(id).value])),e:events()},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download='life-simulator-settings.json';a.click()};
-$('import').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader;r.onload=()=>{try{let d=JSON.parse(r.result);Object.entries(d.v||{}).forEach(([k,v])=>{if($(k))$(k).value=v});$('events').innerHTML='';(d.e||[]).forEach(addEvent);calc()}catch{alert('読み込み失敗')}};r.readAsText(f)};
-calc();
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.t).classList.add('active');calc();renderCompare()});ids.forEach(id=>$(id).oninput=()=>{calc();markDirty()});$('calc').onclick=()=>{calc();renderCompare()};$('addEvent').onclick=()=>{addEvent();markDirty()};
+
+const BASE_VALUES=Object.fromEntries(ids.map(id=>[id,$(id).value]));
+function snapshot(){return {v:Object.fromEntries(ids.map(id=>[id,$(id).value])),e:events()}}
+function applySnap(d){Object.entries(d.v||{}).forEach(([k,v])=>{if($(k))$(k).value=v});$('events').innerHTML='';(d.e||[]).forEach(addEvent)}
+function scenarioStore(){try{return JSON.parse(localStorage.getItem('lifeSimScenariosV2')||'null')}catch{return null}}
+let store=scenarioStore();
+if(!store){
+  let legacy=null;try{legacy=JSON.parse(localStorage.getItem('lifeSim')||'null')}catch{}
+  store={current:0,items:[{name:'基本シナリオ',...(legacy||{v:{...BASE_VALUES},e:[]})}],compare:[0]};
+}
+function persist(){localStorage.setItem('lifeSimScenariosV2',JSON.stringify(store))}
+function saveCurrent(silent=true){if(!store.items.length)return;store.items[store.current]={...store.items[store.current],...snapshot()};persist();renderScenarioUI();if(!silent)alert('この端末に保存しました')}
+function loadScenario(i){saveCurrent(true);store.current=i;applySnap(store.items[i]);persist();renderScenarioUI();calc();renderCompare()}
+function markDirty(){let chip=document.querySelector('.scenarioChip.active');if(chip&&!chip.dataset.dirty){chip.dataset.dirty='1';let nm=chip.querySelector('.scName');if(nm&&!nm.textContent.endsWith(' *'))nm.textContent+=' *'}}
+function renderScenarioUI(){
+  const list=$('scenarioList'),checks=$('compareChecks');list.innerHTML='';checks.innerHTML='';
+  store.items.forEach((sc,i)=>{
+    let d=document.createElement('div');d.className='scenarioChip'+(i===store.current?' active':'');
+    let b=document.createElement('button');b.type='button';b.className='scName';b.textContent=sc.name;b.onclick=()=>loadScenario(i);d.appendChild(b);list.appendChild(d);
+    let lab=document.createElement('label');let cb=document.createElement('input');cb.type='checkbox';cb.checked=(store.compare||[]).includes(i);cb.onchange=()=>{let a=new Set(store.compare||[]);cb.checked?a.add(i):a.delete(i);store.compare=[...a];persist();renderCompare()};lab.appendChild(cb);lab.appendChild(document.createTextNode(sc.name));checks.appendChild(lab);
+  })
+}
+$('save').onclick=()=>saveCurrent(false);
+$('newScenario').onclick=()=>{saveCurrent(true);let name=prompt('新しいシナリオ名','新規シナリオ');if(!name)return;store.items.push({name,v:{...BASE_VALUES},e:[]});store.current=store.items.length-1;store.compare=[...(store.compare||[]),store.current];persist();applySnap(store.items[store.current]);renderScenarioUI();calc();renderCompare()};
+$('dupScenario').onclick=()=>{saveCurrent(true);let src=store.items[store.current],name=prompt('複製後の名前',src.name+' コピー');if(!name)return;store.items.push({name,v:{...src.v},e:JSON.parse(JSON.stringify(src.e||[]))});store.current=store.items.length-1;store.compare=[...(store.compare||[]),store.current];persist();applySnap(store.items[store.current]);renderScenarioUI();calc();renderCompare()};
+$('renameScenario').onclick=()=>{let cur=store.items[store.current],name=prompt('シナリオ名',cur.name);if(!name)return;cur.name=name;persist();renderScenarioUI();renderCompare()};
+$('deleteScenario').onclick=()=>{if(store.items.length<=1){alert('最後の1件は削除できません');return}if(!confirm('このシナリオを削除しますか？'))return;saveCurrent(true);store.items.splice(store.current,1);store.compare=(store.compare||[]).filter(i=>i!==store.current).map(i=>i>store.current?i-1:i);store.current=Math.max(0,store.current-1);applySnap(store.items[store.current]);persist();renderScenarioUI();calc();renderCompare()};
+
+function resultForScenario(sc){
+  const original=snapshot();
+  applySnap(sc);
+  const r=sim();
+  applySnap(original);
+  const findAge=a=>r.find(x=>x.age===a)||r.at(-1);
+  return {r, a40:findAge(40),a50:findAge(50),a60:findAge(60),a75:findAge(75),final:r.at(-1)}
+}
+function renderCompare(){
+  if(!$('compareHead')||!$('compareBody'))return;
+  saveCurrent(true);
+  const selected=(store.compare||[]).filter(i=>store.items[i]).slice(0,6);
+  if(!selected.length){$('compareHead').innerHTML='';$('compareBody').innerHTML='<tr><td>比較するシナリオを上部で選択してください。</td></tr>';return}
+  const currentSnap=snapshot();
+  const cols=selected.map(i=>({name:store.items[i].name,res:resultForScenario(store.items[i])}));
+  applySnap(currentSnap);calc();
+  $('compareHead').innerHTML='<tr><th>指標</th>'+cols.map(c=>'<th>'+c.name+'</th>').join('')+'</tr>';
+  const rows=[
+    ['40歳 総資産',c=>c.res.a40.total],
+    ['40歳 流動資産',c=>c.res.a40.liquid],
+    ['50歳 総資産',c=>c.res.a50.total],
+    ['50歳 流動資産',c=>c.res.a50.liquid],
+    ['60歳 総資産',c=>c.res.a60.total],
+    ['60歳 流動資産',c=>c.res.a60.liquid],
+    ['75歳 総資産',c=>c.res.a75.total],
+    ['旅行・自由費累計',c=>c.res.final.spent],
+    ['75歳 母への残債',c=>-c.res.final.mom]
+  ];
+  $('compareBody').innerHTML=rows.map(([label,fn])=>'<tr><td>'+label+'</td>'+cols.map(c=>'<td>'+man(fn(c))+'</td>').join('')+'</tr>').join('');
+}
+
+$('export').onclick=()=>{saveCurrent(true);let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({version:2,store},null,2)],{type:'application/json'}));a.download='life-simulator-scenarios.json';a.click()};
+$('import').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader;r.onload=()=>{try{let d=JSON.parse(r.result);if(d.store&&Array.isArray(d.store.items)){store=d.store}else if(d.v){store={current:0,items:[{name:'読み込み',v:d.v,e:d.e||[]}],compare:[0]}}else throw new Error();persist();applySnap(store.items[store.current]);renderScenarioUI();calc();renderCompare()}catch{alert('読み込み失敗')}};r.readAsText(f)};
+
+applySnap(store.items[store.current]);renderScenarioUI();calc();renderCompare();
 </script></body></html>
