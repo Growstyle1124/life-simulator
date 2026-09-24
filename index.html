@@ -66,12 +66,26 @@
 </section>
 
 <section class="sec" id="family"><div class="grid g2">
-<div class="card"><h2>役員報酬・復職</h2><div class="grid g2">
-<div class="field"><label>復職前世帯手取り</label><input id="netBefore" value="34.54" step=".1" type="number"><span class="u">万円/月</span></div>
+<div class="card"><h2>役員報酬・手取り</h2><div class="grid g2">
+<div class="field"><label>本人 役員報酬</label><input id="execSalaryH" value="32" step=".5" type="number"><span class="u">万円/月 額面</span></div>
+<div class="field"><label>配偶者 役員報酬</label><input id="execSalaryW" value="8.5" step=".5" type="number"><span class="u">万円/月 額面</span></div>
+<div class="field"><label>配偶者の社保</label><select id="wifeSocial"><option value="dependent" selected>扶養内（本人社保なし）</option><option value="join">本人加入</option></select></div>
+<div class="field"><label>本人の現在年齢</label><div class="note" style="margin:0">基本設定の「現在年齢」を使用。40〜64歳は介護保険を自動加算。</div></div>
 <div class="field"><label>妻復職</label><input id="returnYear" value="2" type="number"><span class="u">年後</span></div>
 <div class="field"><label>看護師給与</label><input id="wifeSalary" value="30" type="number"><span class="u">万円/月 額面</span></div>
 <div class="field"><label>復職による家計純増</label><input id="wifeGain" value="20" type="number"><span class="u">万円/月</span></div>
-</div></div>
+</div>
+<div class="budgetTotal" style="margin-top:12px">復職前 世帯手取り：<span id="houseNet">-</span> / 月</div>
+<div class="scroll" style="margin-top:8px"><table><thead><tr><th></th><th>本人</th><th>配偶者</th></tr></thead><tbody>
+<tr><td>額面</td><td id="grossH">-</td><td id="grossW">-</td></tr>
+<tr><td>健康・介護保険</td><td id="healthH">-</td><td id="healthW">-</td></tr>
+<tr><td>厚生年金</td><td id="pensionH">-</td><td id="pensionW">-</td></tr>
+<tr><td>所得税等</td><td id="incomeTaxH">-</td><td id="incomeTaxW">-</td></tr>
+<tr><td>住民税</td><td id="residentH">-</td><td id="residentW">-</td></tr>
+<tr><td><b>手取り</b></td><td id="netH"><b>-</b></td><td id="netW"><b>-</b></td></tr>
+</tbody></table></div>
+<div class="note">2026年分の税制・2026年度の協会けんぽ大阪を使った概算です。標準報酬月額、給与所得控除、基礎控除、配偶者控除を反映します。実際の源泉徴収・住民税は前年所得や各種控除で差が出ます。</div>
+</div>
 <div class="card"><h2>子ども</h2><div class="grid g2">
 <div class="field"><label>1人目現在月齢</label><input id="c1m" value="3" type="number"></div>
 <div class="field"><label>2人目</label><select id="c2"><option value="1" selected>想定</option><option value="0">なし</option></select></div>
@@ -137,13 +151,96 @@
 </div>
 <script>
 const $=id=>document.getElementById(id), n=id=>Number($(id).value||0), man=x=>Math.round(x).toLocaleString()+'万円';
-const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','netBefore','returnYear','wifeSalary','wifeGain','c1m','c2','c2gap','c3','c3gap','allowance','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
+const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryH','execSalaryW','wifeSocial','returnYear','wifeSalary','wifeGain','c1m','c2','c2gap','c3','c3gap','allowance','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
 function childAges(y){let a=n('c1m')/12+y,r=[a];if($('c2').value==='1'){r.push(a-n('c2gap'));if($('c3').value==='1')r.push(a-n('c2gap')-n('c3gap'));}return r}
 function childCost(a){if(a<0)return 0;if(a<3)return 2;if(a<6)return 3;if(a<12)return 4;if(a<18)return 6;if(a<23)return 10;return 0}
 function kids(y){return childAges(y).filter(a=>a>=0&&a<18).length}
 function mr(r){return Math.pow(1+r/100,1/12)-1}
 function baseLivingMonthly(){return ['bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance'].reduce((sum,id)=>sum+n(id),0)}
 function renderBudgetTotal(){if($('budgetTotal'))$('budgetTotal').textContent=man(baseLivingMonthly())}
+// 2026年・大阪 協会けんぽをベースにした役員報酬の概算
+function stdHealthSalary(grossMan){
+  const vals=[5.8,6.8,7.8,8.8,9.8,10.4,11,11.8,12.6,13.4,14.2,15,16,17,18,19,20,22,24,26,28,30,32,34,36,38,41,44,47,50,53,56,59,62,65,68,71,75,79,83,88,93,98,103,109,115,121,127,133,139];
+  if(grossMan<=6.3)return 5.8;
+  for(let i=1;i<vals.length;i++){if(grossMan<(vals[i-1]+vals[i])/2)return vals[i-1]}
+  return 139;
+}
+function stdPensionSalary(grossMan){
+  const vals=[8.8,9.8,10.4,11,11.8,12.6,13.4,14.2,15,16,17,18,19,20,22,24,26,28,30,32,34,36,38,41,44,47,50,53,56,59,62,65];
+  if(grossMan<9.3)return 8.8;
+  for(let i=1;i<vals.length;i++){if(grossMan<(vals[i-1]+vals[i])/2)return vals[i-1]}
+  return 65;
+}
+function salaryDeduction(yen){
+  if(yen<=2200000)return 740000;
+  if(yen<=3600000)return yen*.30+80000;
+  if(yen<=6600000)return yen*.20+440000;
+  if(yen<=8500000)return yen*.10+1100000;
+  return 1950000;
+}
+function basicDeduction(income){
+  if(income<=1320000)return 1040000;
+  if(income<=3360000)return 880000;
+  if(income<=4890000)return 680000;
+  if(income<=6550000)return 630000;
+  if(income<=23500000)return 580000;
+  if(income<=24000000)return 480000;
+  if(income<=24500000)return 320000;
+  if(income<=25000000)return 160000;
+  return 0;
+}
+function incomeTaxCalc(taxable){
+  taxable=Math.max(0,Math.floor(taxable/1000)*1000);
+  let tax=0;
+  if(tax<=1949000)tax=taxable*.05;
+  if(taxable>=1950000&&taxable<=3299000)tax=taxable*.10-97500;
+  else if(taxable>=3300000&&taxable<=6949000)tax=taxable*.20-427500;
+  else if(taxable>=6950000&&taxable<=8999000)tax=taxable*.23-636000;
+  else if(taxable>=9000000&&taxable<=17999000)tax=taxable*.33-1536000;
+  else if(taxable>=18000000&&taxable<=39999000)tax=taxable*.40-2796000;
+  else if(taxable>=40000000)tax=taxable*.45-4796000;
+  return Math.max(0,tax*1.021);
+}
+function rolePayCalc(grossMan,ageYears,social=true,spouseGrossMan=0,isHusband=false){
+  const grossY=grossMan*10000*12;
+  const hs=stdHealthSalary(grossMan)*10000;
+  const ps=stdPensionSalary(grossMan)*10000;
+  const healthRate=.1013/2;
+  const careRate=(ageYears>=40&&ageYears<65)?.0162/2:0;
+  const pensionRate=.183/2;
+  const health=social?hs*(healthRate+careRate)*12:0;
+  const pension=social?ps*pensionRate*12:0;
+  const salaryIncome=Math.max(0,grossY-salaryDeduction(grossY));
+  let spouseDed=0;
+  if(isHusband){
+    const spouseY=spouseGrossMan*10000*12;
+    const spouseIncome=Math.max(0,spouseY-salaryDeduction(spouseY));
+    if(spouseIncome<=620000&&salaryIncome<=9000000)spouseDed=380000;
+  }
+  const taxable=salaryIncome-basicDeduction(salaryIncome)-health-pension-spouseDed;
+  const incomeTax=incomeTaxCalc(taxable);
+  const residentBase=Math.max(0,salaryIncome-430000-health-pension-(spouseDed?330000:0));
+  const resident=residentBase>0?residentBase*.10+5000:0;
+  const netY=Math.max(0,grossY-health-pension-incomeTax-resident);
+  return {grossY,health,pension,incomeTax,resident,netY,netM:netY/12,hs,ps};
+}
+function currentHouseholdPay(ageOverride=n('age')){
+  const h=rolePayCalc(n('execSalaryH'),ageOverride,true,n('execSalaryW'),true);
+  const wifeSocial=$('wifeSocial').value==='join';
+  const w=rolePayCalc(n('execSalaryW'),ageOverride,wifeSocial,0,false);
+  return {h,w,houseNetM:(h.netM+w.netM)/10000};
+}
+function renderIncome(){
+  const r=currentHouseholdPay();
+  const yen=v=>Math.round(v).toLocaleString('ja-JP')+'円';
+  $('houseNet').textContent=(r.houseNetM).toFixed(2)+'万円';
+  $('grossH').textContent=yen(r.h.grossY/12);$('grossW').textContent=yen(r.w.grossY/12);
+  $('healthH').textContent=yen(r.h.health/12);$('healthW').textContent=yen(r.w.health/12);
+  $('pensionH').textContent=yen(r.h.pension/12);$('pensionW').textContent=yen(r.w.pension/12);
+  $('incomeTaxH').textContent=yen(r.h.incomeTax/12);$('incomeTaxW').textContent=yen(r.w.incomeTax/12);
+  $('residentH').textContent=yen(r.h.resident/12);$('residentW').textContent=yen(r.w.resident/12);
+  $('netH').textContent=yen(r.h.netM);$('netW').textContent=yen(r.w.netM);
+}
 function events(){return [...document.querySelectorAll('.event')].map(r=>({name:r.querySelector('.en').value,y:Number(r.querySelector('.ey').value||0),amt:Number(r.querySelector('.ea').value||0)}))}
 function addEvent(e={name:'大型支出',y:5,amt:50}){let d=document.createElement('div');d.className='event';d.innerHTML='<div class="field"><label>名称</label><input class="en" value="'+e.name+'"></div><div class="field"><label>年後</label><input class="ey" type="number" value="'+e.y+'"></div><div class="field"><label>金額</label><input class="ea" type="number" value="'+e.amt+'"><span class="u">万円。収入はマイナス</span></div><button>削除</button>';d.querySelector('button').onclick=()=>{d.remove();calc()};d.querySelectorAll('input').forEach(x=>x.oninput=calc);$('events').appendChild(d)}
 function sim(){
@@ -151,7 +248,7 @@ function sim(){
  for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent,income:0,livingCost:0,debtCost:0,lifestyleCost:0,savingCost:0,netCashflow:0,assetDraw:0});if(y===years)break;
   let returned=y>=n('returnYear'),living=baseLivingMonthly()*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=childAges(y).filter(a=>a>=18&&a<23).length*80/12,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
   const allowanceMonthly=kids(y)*n('allowance')/12;
-  const monthlyIncome=n('netBefore')+(returned?n('wifeGain'):0)+allowanceMonthly;
+  const monthlyIncome=currentHouseholdPay(age+y).houseNetM+(returned?n('wifeGain'):0)+allowanceMonthly;
   const monthlyNonSaving=living+cc+college+old+stu+mp+trav+free;
   const preSaveSurplus=monthlyIncome-monthlyNonSaving;
 
@@ -246,7 +343,7 @@ function renderCashflow(r){
   const ages=[n('age'),35,40,45,50,55,60,65,70,75].filter((a,i,arr)=>a>=n('age')&&arr.indexOf(a)===i);
   $('cashflowTable').innerHTML=ages.map(a=>{let q=r.find(x=>x.age===a)||r.at(-1);return '<tr><td>'+a+'歳</td><td>'+man(q.income)+'</td><td>'+man(q.livingCost)+'</td><td>'+man(q.debtCost)+'</td><td>'+man(q.lifestyleCost)+'</td><td>'+man(q.savingCost)+'</td><td>'+man(q.netCashflow)+'</td><td>'+(q.assetDraw>0?'<span style="color:#f1c75b">'+man(q.assetDraw)+'</span>':'0万円')+'</td></tr>'}).join('');
 }
-function calc(){renderBudgetTotal();let r=sim(),now=r[0],ten=r.find(x=>x.y===10)||r.at(-1),sixty=r.find(x=>x.age===60)||r.at(-1),last=r.at(-1);$('s0').textContent=man(now.total);$('sc').textContent=man(now.cash);$('s10').textContent=man(ten.total);$('s60').textContent=man(sixty.total);$('sspend').textContent=man(last.spent);$('milestones').innerHTML=[35,40,45,50,55,60,65,70,75].filter(a=>a>=n('age')).map(a=>{let q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');$('breakdown').innerHTML=[['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k],['母への残債',-last.mom]].map(a=>'<tr><td>'+a[0]+'</td><td>'+man(a[1])+'</td></tr>').join('');$('freedom').innerHTML=[40,45,50,55,60].map(a=>{let q=r.find(x=>x.age===a);if(!q)return'';let ml=baseLivingMonthly()*Math.pow(1+n('infl')/100,a-n('age')),yc=q.liquid/(ml*12);return '<div class="status"><b>'+a+'歳</b>：流動資産 '+man(q.liquid)+' ／ 生活費約 '+yc.toFixed(1)+'年分</div>'}).join('')+'<div class="status">目標は仕事を辞めることではなく、<b>お金に困らず好きだから働ける状態</b>。</div>';renderCashflow(r);draw(r)}
+function calc(){renderBudgetTotal();renderIncome();let r=sim(),now=r[0],ten=r.find(x=>x.y===10)||r.at(-1),sixty=r.find(x=>x.age===60)||r.at(-1),last=r.at(-1);$('s0').textContent=man(now.total);$('sc').textContent=man(now.cash);$('s10').textContent=man(ten.total);$('s60').textContent=man(sixty.total);$('sspend').textContent=man(last.spent);$('milestones').innerHTML=[35,40,45,50,55,60,65,70,75].filter(a=>a>=n('age')).map(a=>{let q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');$('breakdown').innerHTML=[['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k],['母への残債',-last.mom]].map(a=>'<tr><td>'+a[0]+'</td><td>'+man(a[1])+'</td></tr>').join('');$('freedom').innerHTML=[40,45,50,55,60].map(a=>{let q=r.find(x=>x.age===a);if(!q)return'';let ml=baseLivingMonthly()*Math.pow(1+n('infl')/100,a-n('age')),yc=q.liquid/(ml*12);return '<div class="status"><b>'+a+'歳</b>：流動資産 '+man(q.liquid)+' ／ 生活費約 '+yc.toFixed(1)+'年分</div>'}).join('')+'<div class="status">目標は仕事を辞めることではなく、<b>お金に困らず好きだから働ける状態</b>。</div>';renderCashflow(r);draw(r)}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.t).classList.add('active');calc();renderCompare()});ids.forEach(id=>$(id).oninput=()=>{calc();markDirty()});$('calc').onclick=()=>{calc();renderCompare()};$('addEvent').onclick=()=>{addEvent();markDirty()};
 
 const BASE_VALUES=Object.fromEntries(ids.map(id=>[id,$(id).value]));
