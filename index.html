@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>人生・資産形成シミュレーター</title>
+<style>
+:root{--bg:#0b0e14;--p:#121722;--p2:#171e2c;--t:#eef2f7;--m:#9aa6b2;--l:#293243;--a:#6ea8fe;--g:#7bd89b;--y:#f1c75b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.w{max-width:1180px;margin:auto;padding:18px}.sub,.u,.muted{color:var(--m);font-size:12px}.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:15px}.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0}.metric{background:var(--p2);border:1px solid var(--l);border-radius:13px;padding:12px}.metric b{display:block;font-size:21px;margin-top:4px}.field{display:flex;flex-direction:column;gap:4px}label{font-size:12px;color:var(--m)}input,select,button{background:#0f1520;color:var(--t);border:1px solid var(--l);border-radius:9px;padding:9px;font-size:16px}button{cursor:pointer}.primary{background:var(--a);color:#08111c;font-weight:700}.tabs,.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab.active{background:var(--a);color:#08111c}.sec{display:none}.sec.active{display:block}canvas{width:100%;height:320px;background:#0d131d;border:1px solid var(--l);border-radius:12px}.status{background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:9px;margin-top:7px;font-size:13px}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:8px;text-align:right}td:first-child,th:first-child{text-align:left}.scroll{overflow:auto}.note{padding:10px;border-radius:10px;background:#101827;color:var(--m);font-size:12px;margin-top:10px}.event{display:grid;grid-template-columns:1.2fr .7fr .8fr auto;gap:7px;margin:8px 0;align-items:end}@media(max-width:760px){.g2,.g3,.sum{grid-template-columns:1fr 1fr}.event{grid-template-columns:1fr 1fr}}@media(max-width:520px){.g2,.g3,.sum,.event{grid-template-columns:1fr}.w{padding:10px}}
+</style></head><body><div class="w">
+<h1 style="margin:0">人生・資産形成シミュレーター</h1><div class="sub">お金に追われず、好きだから働ける状態をつくるための家計シミュレーター</div>
+<div class="bar"><button class="primary" id="calc">再計算</button><button id="save">この端末に保存</button><button id="export">設定を書き出す</button><label style="border:1px solid var(--l);border-radius:9px;padding:9px;cursor:pointer">設定を読み込む<input id="import" type="file" accept=".json" hidden></label></div>
+<div class="sum"><div class="metric"><span class="muted">現在総資産</span><b id="s0">-</b></div><div class="metric"><span class="muted">現金</span><b id="sc">-</b></div><div class="metric"><span class="muted">10年後</span><b id="s10">-</b></div><div class="metric"><span class="muted">60歳</span><b id="s60">-</b></div><div class="metric"><span class="muted">旅行・自由費累計</span><b id="sspend">-</b></div></div>
+<div class="tabs"><button class="tab active" data-t="base">基本</button><button class="tab" data-t="family">家族・収入</button><button class="tab" data-t="invest">資産形成</button><button class="tab" data-t="debt">返済・イベント</button><button class="tab" data-t="result">結果</button></div>
+
+<section class="sec active" id="base"><div class="grid g2">
+<div class="card"><h2>現在の資産</h2><div class="grid g2">
+<div class="field"><label>夫現金</label><input id="cashH" value="0" type="number"><span class="u">万円</span></div>
+<div class="field"><label>妻現金</label><input id="cashW" value="100" type="number"><span class="u">万円</span></div>
+<div class="field"><label>役員借入金</label><input id="loan" value="150" type="number"><span class="u">万円</span></div>
+<div class="field"><label>特定口座</label><input id="taxable" value="60" type="number"><span class="u">万円</span></div>
+<div class="field"><label>Bitcoin</label><input id="btc" value="100" type="number"><span class="u">万円</span></div>
+<div class="field"><label>iDeCo</label><input id="ideco" value="170" type="number"><span class="u">万円</span></div>
+<div class="field"><label>NISA</label><input id="nisa" value="0" type="number"><span class="u">万円</span></div>
+<div class="field"><label>小規模企業共済</label><input id="kyosai" value="0" type="number"><span class="u">万円</span></div>
+</div></div>
+<div class="card"><h2>生活・目標</h2><div class="grid g2">
+<div class="field"><label>現在年齢</label><input id="age" value="33" type="number"></div>
+<div class="field"><label>働く想定年齢</label><input id="workUntil" value="60" type="number"></div>
+<div class="field"><label>生活費</label><input id="living" value="30" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>生活費インフレ</label><input id="infl" value="2" step=".1" type="number"><span class="u">%/年</span></div>
+<div class="field"><label>旅行費</label><input id="travel" value="30" type="number"><span class="u">万円/年</span></div>
+<div class="field"><label>余裕時旅行費</label><input id="travelRich" value="50" type="number"><span class="u">万円/年</span></div>
+<div class="field"><label>夫婦自由費</label><input id="free" value="30" type="number"><span class="u">万円/年</span></div>
+<div class="field"><label>現金バッファ</label><input id="buffer" value="180" type="number"><span class="u">万円</span></div>
+</div></div></div></section>
+
+<section class="sec" id="family"><div class="grid g2">
+<div class="card"><h2>役員報酬・復職</h2><div class="grid g2">
+<div class="field"><label>復職前世帯手取り</label><input id="netBefore" value="34.54" step=".1" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>妻復職</label><input id="returnYear" value="2" type="number"><span class="u">年後</span></div>
+<div class="field"><label>看護師給与</label><input id="wifeSalary" value="30" type="number"><span class="u">万円/月 額面</span></div>
+<div class="field"><label>復職による家計純増</label><input id="wifeGain" value="20" type="number"><span class="u">万円/月</span></div>
+</div></div>
+<div class="card"><h2>子ども</h2><div class="grid g2">
+<div class="field"><label>1人目現在月齢</label><input id="c1m" value="3" type="number"></div>
+<div class="field"><label>2人目</label><select id="c2"><option value="1" selected>想定</option><option value="0">なし</option></select></div>
+<div class="field"><label>2人目年齢差</label><input id="c2gap" value="2.5" step=".5" type="number"></div>
+<div class="field"><label>3人目</label><select id="c3"><option value="1" selected>想定</option><option value="0">なし</option></select></div>
+<div class="field"><label>3人目年齢差</label><input id="c3gap" value="2.5" step=".5" type="number"></div>
+<div class="field"><label>児童手当平均</label><input id="allowance" value="18" type="number"><span class="u">万円/年・人、全額NISA</span></div>
+</div><div class="note">大学は私立もあり得る前提。年齢別追加生活費は 0–2歳:2万 / 3–5歳:3万 / 6–11歳:4万 / 12–17歳:6万 / 18–22歳:10万円/月。私立大学はさらに年80万円を初期値として計算。</div></div>
+</div></section>
+
+<section class="sec" id="invest"><div class="grid g2">
+<div class="card"><h2>2027年からの積立</h2><div class="grid g2">
+<div class="field"><label>NISA</label><input id="nisaM" value="3" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>iDeCo</label><input id="idecoM" value=".5" step=".1" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>共済</label><input id="kyosaiM" value="1.5" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>現金</label><input id="cashM" value="2.1" step=".1" type="number"><span class="u">万円/月</span></div>
+</div></div>
+<div class="card"><h2>自動増額</h2><div class="grid g2">
+<div class="field"><label>現金達成後 NISA加算</label><input id="nisaBoost" value="2" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>復職後 NISA加算</label><input id="nisaReturn" value="5" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>復職後 iDeCo</label><input id="idecoReturn" value="1.5" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>復職後 共済</label><input id="kyosaiReturn" value="3" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>旅行増額の流動資産基準</label><input id="rich" value="2000" type="number"><span class="u">万円</span></div>
+</div></div>
+<div class="card"><h2>利回り</h2><div class="grid g2">
+<div class="field"><label>NISA・特定口座</label><input id="rStock" value="5" step=".5" type="number"><span class="u">%/年</span></div>
+<div class="field"><label>iDeCo</label><input id="rIdeco" value="4" step=".5" type="number"><span class="u">%/年</span></div>
+<div class="field"><label>Bitcoin</label><input id="rBtc" value="0" type="number"><span class="u">%/年</span></div>
+<div class="field"><label>共済</label><input id="rK" value="1" step=".1" type="number"><span class="u">%/年 比較用</span></div>
+</div></div>
+<div class="card"><h2>老後</h2><div class="grid g2"><div class="field"><label>年金開始</label><input id="pAge" value="65" type="number"></div><div class="field"><label>世帯年金概算</label><input id="pension" value="20" type="number"><span class="u">万円/月</span></div></div><div class="note">年金は参考扱い。老後資金はiDeCo・NISA・共済を中心に見る設計です。</div></div>
+</div></section>
+
+<section class="sec" id="debt"><div class="grid g2">
+<div class="card"><h2>返済</h2><div class="grid g2">
+<div class="field"><label>母への残債</label><input id="momDebt" value="400" type="number"><span class="u">万円</span></div>
+<div class="field"><label>返済（月）</label><input id="momPay" value="3" step=".5" type="number"><span class="u">万円</span></div>
+<div class="field"><label>復職後返済（月）</label><input id="momPay2" value="7" step=".5" type="number"><span class="u">万円</span></div>
+<div class="field"><label>旧車返済</label><input id="oldCar" value="1.45" step=".05" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>旧車残期間</label><input id="oldCarY" value="3.5" step=".5" type="number"><span class="u">年</span></div>
+<div class="field"><label>奨学金</label><input id="student" value="2.2" step=".1" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>奨学金残期間</label><input id="studentY" value="10" type="number"><span class="u">年</span></div>
+</div></div>
+<div class="card"><h2>車・古民家</h2><div class="grid g2">
+<div class="field"><label>車買替</label><input id="carY" value="5" type="number"><span class="u">年後</span></div>
+<div class="field"><label>売却額</label><input id="carSell" value="300" type="number"><span class="u">万円</span></div>
+<div class="field"><label>次車購入額</label><input id="carBuy" value="300" type="number"><span class="u">万円</span></div>
+<div class="field"><label>古民家</label><input id="kominkaY" value="10" type="number"><span class="u">年後</span></div>
+<div class="field"><label>古民家予算</label><input id="kominka" value="0" type="number"><span class="u">万円・未定なら0</span></div>
+</div></div>
+<div class="card"><h2>追加イベント</h2><div id="events"></div><button id="addEvent">＋イベント追加</button><div class="note">大型旅行、家電、改修、臨時収入などを自由に追加できます。</div></div>
+</div></section>
+
+<section class="sec" id="result"><div class="grid g2">
+<div class="card"><h2>資産推移</h2><canvas id="chart" width="900" height="320"></canvas><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済</div></div>
+<div class="card"><h2>経済的自由度</h2><div id="freedom"></div></div>
+<div class="card"><h2>節目</h2><div class="scroll"><table><thead><tr><th>年齢</th><th>総資産</th><th>流動</th><th>拘束</th></tr></thead><tbody id="milestones"></tbody></table></div></div>
+<div class="card"><h2>75歳時点内訳</h2><div class="scroll"><table><tbody id="breakdown"></tbody></table></div></div>
+</div></section>
+<div class="note">これは家計設計用の概算です。税・社会保険・児童手当・年金・投資収益・Bitcoin・共済の将来額を保証するものではありません。</div>
+</div>
+<script>
+const $=id=>document.getElementById(id), n=id=>Number($(id).value||0), man=x=>Math.round(x).toLocaleString()+'万円';
+const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','living','infl','travel','travelRich','free','buffer','netBefore','returnYear','wifeSalary','wifeGain','c1m','c2','c2gap','c3','c3gap','allowance','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
+function childAges(y){let a=n('c1m')/12+y,r=[a];if($('c2').value==='1'){r.push(a-n('c2gap'));if($('c3').value==='1')r.push(a-n('c2gap')-n('c3gap'));}return r}
+function childCost(a){if(a<0)return 0;if(a<3)return 2;if(a<6)return 3;if(a<12)return 4;if(a<18)return 6;if(a<23)return 10;return 0}
+function kids(y){return childAges(y).filter(a=>a>=0&&a<18).length}
+function mr(r){return Math.pow(1+r/100,1/12)-1}
+function events(){return [...document.querySelectorAll('.event')].map(r=>({name:r.querySelector('.en').value,y:Number(r.querySelector('.ey').value||0),amt:Number(r.querySelector('.ea').value||0)}))}
+function addEvent(e={name:'大型支出',y:5,amt:50}){let d=document.createElement('div');d.className='event';d.innerHTML='<div class="field"><label>名称</label><input class="en" value="'+e.name+'"></div><div class="field"><label>年後</label><input class="ey" type="number" value="'+e.y+'"></div><div class="field"><label>金額</label><input class="ea" type="number" value="'+e.amt+'"><span class="u">万円。収入はマイナス</span></div><button>削除</button>';d.querySelector('button').onclick=()=>{d.remove();calc()};d.querySelectorAll('input').forEach(x=>x.oninput=calc);$('events').appendChild(d)}
+function sim(){
+ let age=n('age'),years=Math.max(1,75-age),cash=n('cashH')+n('cashW'),loan=n('loan'),tax=n('taxable'),btc=n('btc'),ideco=n('ideco'),nisa=n('nisa'),k=n('kyosai'),mom=n('momDebt'),spent=0,out=[],ev=events(),rs=mr(n('rStock')),ri=mr(n('rIdeco')),rb=mr(n('rBtc')),rk=mr(n('rK'));
+ for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent});if(y===years)break;
+  let returned=y>=n('returnYear'),living=n('living')*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=childAges(y).filter(a=>a>=18&&a<23).length*80/12,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
+  let surplus=n('netBefore')-living-cc-college-old-stu-mp-trav-free+(returned?n('wifeGain'):0);
+  let cm=n('cashM'),nm=n('nisaM'),im=n('idecoM'),km=n('kyosaiM');
+  if(cash>=n('buffer')){cm=Math.min(cm,.5);nm+=n('nisaBoost')} if(returned){nm+=n('nisaReturn');im=Math.max(im,n('idecoReturn'));km=Math.max(km,n('kyosaiReturn'))}
+  nm+=kids(y)*n('allowance')/12;
+  let planned=cm+nm+im+km,avail=Math.max(0,surplus);if(planned>avail){let cut=planned-avail,q=Math.min(cm,cut);cm-=q;cut-=q;q=Math.min(nm,cut);nm-=q;cut-=q;q=Math.min(km,cut);km-=q;cut-=q;q=Math.min(im,cut);im-=q}
+  planned=cm+nm+im+km;let extra=Math.max(0,avail-planned);if(cash<n('buffer'))cm+=extra;else nm+=extra;
+  for(let m=0;m<12;m++){tax*=1+rs;nisa=nisa*(1+rs)+nm;ideco=ideco*(1+ri)+im;btc*=1+rb;k=k*(1+rk)+km;cash+=cm;spent+=trav+free;if(mom>0)mom=Math.max(0,mom-mp)}
+  if(Math.round(y+1)===Math.round(n('carY'))){cash-=Math.max(0,n('carBuy')-n('carSell'))}
+  if(n('kominka')>0&&Math.round(y+1)===Math.round(n('kominkaY')))cash-=n('kominka');
+  ev.filter(e=>Math.round(e.y)===Math.round(y+1)).forEach(e=>cash-=e.amt);
+  if(cash<0){nisa+=cash;cash=0}if(nisa<0){tax+=nisa;nisa=0}if(tax<0){loan+=tax;tax=0}if(loan<0)loan=0;
+ } return out
+}
+function draw(r){let c=$('chart'),x=c.getContext('2d'),W=c.width,H=c.height,p={l:55,r:18,t:20,b:35},max=Math.max(...r.map(v=>v.total),1)*1.08,X=i=>p.l+(W-p.l-p.r)*i/(r.length-1),Y=v=>H-p.b-(H-p.t-p.b)*v/max;x.clearRect(0,0,W,H);x.font='12px sans-serif';for(let i=0;i<=4;i++){let v=max*i/4,y=Y(v);x.strokeStyle='#293243';x.beginPath();x.moveTo(p.l,y);x.lineTo(W-p.r,y);x.stroke();x.fillStyle='#9aa6b2';x.fillText(Math.round(v)+'万',5,y+4)}function line(k,col){x.beginPath();r.forEach((v,i)=>i?x.lineTo(X(i),Y(v[k])):x.moveTo(X(i),Y(v[k])));x.strokeStyle=col;x.lineWidth=2.5;x.stroke()}line('total','#8fd3ff');line('liquid','#90be6d');line('locked','#f1c75b')}
+function calc(){let r=sim(),now=r[0],ten=r.find(x=>x.y===10)||r.at(-1),sixty=r.find(x=>x.age===60)||r.at(-1),last=r.at(-1);$('s0').textContent=man(now.total);$('sc').textContent=man(now.cash);$('s10').textContent=man(ten.total);$('s60').textContent=man(sixty.total);$('sspend').textContent=man(last.spent);$('milestones').innerHTML=[35,40,45,50,55,60,65,70,75].filter(a=>a>=n('age')).map(a=>{let q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');$('breakdown').innerHTML=[['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k],['母への残債',-last.mom]].map(a=>'<tr><td>'+a[0]+'</td><td>'+man(a[1])+'</td></tr>').join('');$('freedom').innerHTML=[40,45,50,55,60].map(a=>{let q=r.find(x=>x.age===a);if(!q)return'';let ml=n('living')*Math.pow(1+n('infl')/100,a-n('age')),yc=q.liquid/(ml*12);return '<div class="status"><b>'+a+'歳</b>：流動資産 '+man(q.liquid)+' ／ 生活費約 '+yc.toFixed(1)+'年分</div>'}).join('')+'<div class="status">目標は仕事を辞めることではなく、<b>お金に困らず好きだから働ける状態</b>。</div>';draw(r)}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.t).classList.add('active');calc()});ids.forEach(id=>$(id).oninput=calc);$('calc').onclick=calc;$('addEvent').onclick=()=>addEvent();
+$('save').onclick=()=>{localStorage.setItem('lifeSim',JSON.stringify({v:Object.fromEntries(ids.map(id=>[id,$(id).value])),e:events()}));alert('この端末に保存しました')};
+let saved=localStorage.getItem('lifeSim');if(saved){try{let d=JSON.parse(saved);Object.entries(d.v||{}).forEach(([k,v])=>{if($(k))$(k).value=v});(d.e||[]).forEach(addEvent)}catch{}}
+$('export').onclick=()=>{let d={v:Object.fromEntries(ids.map(id=>[id,$(id).value])),e:events()},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download='life-simulator-settings.json';a.click()};
+$('import').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader;r.onload=()=>{try{let d=JSON.parse(r.result);Object.entries(d.v||{}).forEach(([k,v])=>{if($(k))$(k).value=v});$('events').innerHTML='';(d.e||[]).forEach(addEvent);calc()}catch{alert('読み込み失敗')}};r.readAsText(f)};
+calc();
+</script></body></html>
