@@ -75,7 +75,10 @@
 <div class="field"><label>看護師給与</label><input id="wifeSalary" value="30" type="number"><span class="u">万円/月 額面</span></div>
 <div class="field"><label>復職による家計純増</label><input id="wifeGain" value="20" type="number"><span class="u">万円/月</span></div>
 </div>
-<div class="budgetTotal" style="margin-top:12px">復職前 世帯手取り：<span id="houseNet">-</span> / 月</div>
+<div class="grid g2" style="margin-top:12px">
+  <div class="budgetTotal">復職前 世帯手取り：<span id="houseNetBefore">-</span> / 月</div>
+  <div class="budgetTotal">復職後 世帯手取り：<span id="houseNetAfter">-</span> / 月</div>
+</div>
 <div class="scroll" style="margin-top:8px"><table><thead><tr><th></th><th>本人</th><th>配偶者</th></tr></thead><tbody>
 <tr><td>額面</td><td id="grossH">-</td><td id="grossW">-</td></tr>
 <tr><td>健康・介護保険</td><td id="healthH">-</td><td id="healthW">-</td></tr>
@@ -233,7 +236,8 @@ function currentHouseholdPay(ageOverride=n('age')){
 function renderIncome(){
   const r=currentHouseholdPay();
   const yen=v=>Math.round(v).toLocaleString('ja-JP')+'円';
-  $('houseNet').textContent=(r.houseNetM).toFixed(2)+'万円';
+  $('houseNetBefore').textContent=(r.houseNetM).toFixed(2)+'万円';
+  $('houseNetAfter').textContent=(r.houseNetM+n('wifeGain')).toFixed(2)+'万円';
   $('grossH').textContent=yen(r.h.grossY/12);$('grossW').textContent=yen(r.w.grossY/12);
   $('healthH').textContent=yen(r.h.health/12);$('healthW').textContent=yen(r.w.health/12);
   $('pensionH').textContent=yen(r.h.pension/12);$('pensionW').textContent=yen(r.w.pension/12);
