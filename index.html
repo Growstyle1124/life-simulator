@@ -119,13 +119,16 @@
 </div>
 <div class="card"><h2>子ども</h2><div class="grid g2">
 <div class="field"><label>1人目現在月齢</label><input id="c1m" value="3" type="number"></div>
+<div class="field"><label>1人目 大学</label><select id="c1uni"><option value="public">国公立</option><option value="private" selected>私立</option></select></div>
 <div class="field"><label>2人目</label><select id="c2"><option value="1" selected>想定</option><option value="0">なし</option></select></div>
 <div class="field"><label>2人目年齢差</label><input id="c2gap" value="2.5" step=".5" type="number"></div>
+<div class="field"><label>2人目 大学</label><select id="c2uni"><option value="public">国公立</option><option value="private" selected>私立</option></select></div>
 <div class="field"><label>3人目</label><select id="c3"><option value="1" selected>想定</option><option value="0">なし</option></select></div>
 <div class="field"><label>3人目年齢差</label><input id="c3gap" value="2.5" step=".5" type="number"></div>
+<div class="field"><label>3人目 大学</label><select id="c3uni"><option value="public">国公立</option><option value="private" selected>私立</option></select></div>
 <div class="field"><label>児童手当平均</label><input id="allowance" value="18" type="number"><span class="u">万円/年・人、全額を子ども別財布へ</span></div>
 <div class="field"><label>子ども資産の想定利回り</label><input id="rChild" value="5" step=".5" type="number"><span class="u">%/年</span></div>
-</div><div class="note">児童手当は親の収入・NISA・総資産には含めず、子どもごとの別財布で積み立てます。大学は私立もあり得る前提。年齢別追加生活費は 0–2歳:2万 / 3–5歳:3万 / 6–11歳:4万 / 12–17歳:6万 / 18–22歳:10万円/月。私立大学はさらに年80万円を初期値として計算。</div></div>
+</div><div class="note">児童手当は親の収入・NISA・総資産には含めず、子どもごとの別財布で積み立てます。大学は私立もあり得る前提。年齢別追加生活費は 0–2歳:2万 / 3–5歳:3万 / 6–11歳:4万 / 12–17歳:6万 / 18–22歳:10万円/月。大学は子どもごとに国公立 / 私立を選択でき、私立の場合のみ年80万円を追加して計算。</div></div>
 </div></section>
 
 <section class="sec" id="invest"><div class="grid g2">
@@ -184,9 +187,13 @@
 </div>
 <script>
 const $=id=>document.getElementById(id), n=id=>Number($(id).value||0), man=x=>Math.round(x).toLocaleString()+'万円';
-const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryHBefore','execSalaryWBefore','execSalaryHAfter','execSalaryWAfter','wifeSocial','returnYear','wifeSalary','wifeGain','bonusH','bonusW','bonusMode','c1m','c2','c2gap','c3','c3gap','allowance','rChild','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
+const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryHBefore','execSalaryWBefore','execSalaryHAfter','execSalaryWAfter','wifeSocial','returnYear','wifeSalary','wifeGain','bonusH','bonusW','bonusMode','c1m','c1uni','c2','c2gap','c2uni','c3','c3gap','c3uni','allowance','rChild','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
 function childAges(y){let a=n('c1m')/12+y,r=[a];if($('c2').value==='1'){r.push(a-n('c2gap'));if($('c3').value==='1')r.push(a-n('c2gap')-n('c3gap'));}return r}
 function childCost(a){if(a<0)return 0;if(a<3)return 2;if(a<6)return 3;if(a<12)return 4;if(a<18)return 6;if(a<23)return 10;return 0}
+function collegePremium(y){
+  const ages=childAges(y),types=[$('c1uni').value,$('c2uni').value,$('c3uni').value];
+  return ages.reduce((sum,a,i)=>sum+((a>=18&&a<23&&types[i]==='private')?80/12:0),0);
+}
 function kids(y){return childAges(y).filter(a=>a>=0&&a<18).length}
 function mr(r){return Math.pow(1+r/100,1/12)-1}
 function customBudget(){return [...document.querySelectorAll('.customBudgetRow')].map(r=>({name:r.querySelector('.cbn').value||'追加項目',amt:Number(r.querySelector('.cba').value||0)}))}
@@ -299,7 +306,7 @@ function addEvent(e={name:'大型支出',y:5,amt:50}){let d=document.createEleme
 function sim(){
  let age=n('age'),years=Math.max(1,75-age),cash=n('cashH')+n('cashW'),loan=n('loan'),tax=n('taxable'),btc=n('btc'),ideco=n('ideco'),nisa=n('nisa'),k=n('kyosai'),mom=n('momDebt'),spent=0,childWallet=[0,0,0],out=[],ev=events(),rs=mr(n('rStock')),ri=mr(n('rIdeco')),rb=mr(n('rBtc')),rk=mr(n('rK')),rc=mr(n('rChild'));
  for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent,child1:childWallet[0],child2:childWallet[1],child3:childWallet[2],childTotal:childWallet.reduce((a,b)=>a+b,0),income:0,livingCost:0,debtCost:0,lifestyleCost:0,savingCost:0,childSaving:0,netCashflow:0,assetDraw:0});if(y===years)break;
-  let returned=y>=n('returnYear'),living=baseLivingMonthly()*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=childAges(y).filter(a=>a>=18&&a<23).length*80/12,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
+  let returned=y>=n('returnYear'),living=baseLivingMonthly()*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=collegePremium(y),old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
   const agesNow=childAges(y);
   const allowanceMonthlyByChild=agesNow.map(a=>(a>=0&&a<18)?n('allowance')/12:0);
   const allowanceMonthly=allowanceMonthlyByChild.reduce((a,b)=>a+b,0);
