@@ -4,10 +4,35 @@
 <style>
 :root{--bg:#0b0e14;--p:#121722;--p2:#171e2c;--t:#eef2f7;--m:#9aa6b2;--l:#293243;--a:#6ea8fe;--g:#7bd89b;--y:#f1c75b}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.w{max-width:1180px;margin:auto;padding:18px}.sub,.u,.muted{color:var(--m);font-size:12px}.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:15px}.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0}.metric{background:var(--p2);border:1px solid var(--l);border-radius:13px;padding:12px}.metric b{display:block;font-size:21px;margin-top:4px}.field{display:flex;flex-direction:column;gap:4px}label{font-size:12px;color:var(--m)}input,select,button{background:#0f1520;color:var(--t);border:1px solid var(--l);border-radius:9px;padding:9px;font-size:16px}button{cursor:pointer}.primary{background:var(--a);color:#08111c;font-weight:700}.tabs,.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab.active{background:var(--a);color:#08111c}.sec{display:none}.sec.active{display:block}canvas{width:100%;height:320px;background:#0d131d;border:1px solid var(--l);border-radius:12px}.chartWrap{position:relative}.chartTip{position:absolute;display:none;pointer-events:none;min-width:170px;background:#090d14;border:1px solid var(--l);border-radius:10px;padding:9px 10px;font-size:12px;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:5}.chartTip b{font-size:13px}.chartTip .tipRow{display:flex;justify-content:space-between;gap:12px;margin-top:3px}.chartTip .blue{color:#8fd3ff}.chartTip .green{color:#90be6d}.chartTip .yellow{color:#f1c75b}.status{background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:9px;margin-top:7px;font-size:13px}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--l);padding:8px;text-align:right}td:first-child,th:first-child{text-align:left}.scroll{overflow:auto}.note{padding:10px;border-radius:10px;background:#101827;color:var(--m);font-size:12px;margin-top:10px}.budgetTotal{margin-top:10px;padding:10px;border:1px solid var(--l);border-radius:10px;background:var(--p2);font-weight:700}.customBudgetRow{display:grid;grid-template-columns:1.4fr 1fr auto;gap:8px;align-items:end;margin-top:8px}.customBudgetRow button{padding:9px 11px}.customBudgetHead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.event{display:grid;grid-template-columns:1.2fr .7fr .8fr auto;gap:7px;margin:8px 0;align-items:end}
-.scenarioBox{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:12px;margin:12px 0}.scenarioHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.scenarioList{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.scenarioChip{display:flex;align-items:center;gap:6px;background:var(--p2);border:1px solid var(--l);border-radius:999px;padding:5px 9px}.scenarioChip.active{border-color:var(--a);box-shadow:0 0 0 1px var(--a) inset}.scenarioChip button{padding:4px 8px;border-radius:999px;font-size:12px}.scenarioActions{display:flex;gap:6px;flex-wrap:wrap}.compareChecks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.compareChecks label{display:flex;align-items:center;gap:5px;border:1px solid var(--l);border-radius:9px;padding:6px 8px;background:#0f1520}.compareChecks input{width:auto}.compareTable th,.compareTable td{text-align:right}.compareTable th:first-child,.compareTable td:first-child{text-align:left}@media(max-width:760px){.g2,.g3,.sum{grid-template-columns:1fr 1fr}.event{grid-template-columns:1fr 1fr}}@media(max-width:520px){.g2,.g3,.sum,.event{grid-template-columns:1fr}.w{padding:10px}}
+.scenarioBox{background:var(--p);border:1px solid var(--l);border-radius:15px;padding:12px;margin:12px 0}.scenarioHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.scenarioList{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.scenarioChip{display:flex;align-items:center;gap:6px;background:var(--p2);border:1px solid var(--l);border-radius:999px;padding:5px 9px}.scenarioChip.active{border-color:var(--a);box-shadow:0 0 0 1px var(--a) inset}.scenarioChip button{padding:4px 8px;border-radius:999px;font-size:12px}.scenarioActions{display:flex;gap:6px;flex-wrap:wrap}.compareChecks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.compareChecks label{display:flex;align-items:center;gap:5px;border:1px solid var(--l);border-radius:9px;padding:6px 8px;background:#0f1520}.compareChecks input{width:auto}.compareTable th,.compareTable td{text-align:right}.compareTable th:first-child,.compareTable td:first-child{text-align:left}#pdfReport{display:none}
+.pdf-page{background:#fff;color:#172033;padding:0;font-size:11px;line-height:1.45}
+.pdf-head{border-bottom:2px solid #172033;padding-bottom:8px;margin-bottom:12px}
+.pdf-head h1{font-size:22px;margin:0 0 3px}
+.pdf-head .meta{color:#596579;font-size:10px}
+.pdf-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0 14px}
+.pdf-kpi{border:1px solid #cfd6df;border-radius:7px;padding:7px}
+.pdf-kpi span{display:block;color:#647084;font-size:9px}.pdf-kpi b{font-size:16px}
+.pdf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pdf-box{border:1px solid #d6dce5;border-radius:7px;padding:9px;break-inside:avoid;margin-bottom:10px}
+.pdf-box h2{font-size:13px;margin:0 0 6px}
+.pdf-page table{width:100%;border-collapse:collapse;font-size:9px}
+.pdf-page th,.pdf-page td{padding:4px 5px;border-bottom:1px solid #e3e7ec;text-align:right}
+.pdf-page th:first-child,.pdf-page td:first-child{text-align:left}
+.pdf-chart{width:100%;max-height:250px;object-fit:contain;border:1px solid #d6dce5;border-radius:6px}
+.pdf-note{font-size:8.5px;color:#667085;margin-top:8px}
+.pdf-break{break-before:page}
+@media print{
+  @page{size:A4 portrait;margin:11mm}
+  body{background:#fff!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body>.w{display:none!important}
+  #pdfReport{display:block!important}
+  .pdf-page{display:block!important}
+  .pdf-box,.pdf-kpi,tr,img{break-inside:avoid}
+}
+@media(max-width:760px){.g2,.g3,.sum{grid-template-columns:1fr 1fr}.event{grid-template-columns:1fr 1fr}}@media(max-width:520px){.g2,.g3,.sum,.event{grid-template-columns:1fr}.w{padding:10px}}
 </style></head><body><div class="w">
 <h1 style="margin:0">人生・資産形成シミュレーター</h1><div class="sub">お金に追われず、好きだから働ける状態をつくるための家計シミュレーター</div>
-<div class="bar"><button class="primary" id="calc">再計算</button><button id="save">この端末に保存</button><button id="export">設定を書き出す</button><label style="border:1px solid var(--l);border-radius:9px;padding:9px;cursor:pointer">設定を読み込む<input id="import" type="file" accept=".json" hidden></label></div>
+<div class="bar"><button class="primary" id="calc">再計算</button><button id="pdfExport">PDF出力</button><button id="save">この端末に保存</button><button id="export">設定を書き出す</button><label style="border:1px solid var(--l);border-radius:9px;padding:9px;cursor:pointer">設定を読み込む<input id="import" type="file" accept=".json" hidden></label></div>
 <div class="scenarioBox">
     <div class="scenarioHead">
       <div><b>シナリオ</b><div class="muted">条件違いを保存して、複数パターンを比較できます。</div></div>
@@ -197,6 +222,7 @@
 </div></section>
 <div class="note">これは家計設計用の概算です。税・社会保険・児童手当・年金・投資収益・Bitcoin・共済の将来額を保証するものではありません。</div>
 </div>
+<div id="pdfReport"></div>
 <script>
 const $=id=>document.getElementById(id), n=id=>Number($(id).value||0), man=x=>Math.round(x).toLocaleString()+'万円';
 const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryHBefore','execSalaryWBefore','execSalaryHAfter','execSalaryWAfter','wifeSocial','returnYear','wifeSalary','wifeGain','bonusH','bonusW','bonusMode','c1m','c1uni','c1nursery','c2','c2gap','c2uni','c2nursery','c3','c3gap','c3uni','c3nursery','nurseryHours','nurseryCalc','nurseryTaxManual','allowance','rChild','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','retireLiving','retireLifestyle','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
@@ -522,8 +548,70 @@ function renderCashflow(r){
   const ages=[n('age'),35,40,45,50,55,60,65,70,75].filter((a,i,arr)=>a>=n('age')&&arr.indexOf(a)===i);
   $('cashflowTable').innerHTML=ages.map(a=>{let q=r.find(x=>x.age===a)||r.at(-1);return '<tr><td>'+a+'歳</td><td>'+man(q.income)+'</td><td>'+man(q.livingCost)+'</td><td>'+man(q.nurseryCost)+'</td><td>'+man(q.debtCost)+'</td><td>'+man(q.lifestyleCost)+'</td><td>'+man(q.savingCost)+'</td><td>'+man(q.childSaving)+'</td><td>'+man(q.netCashflow)+'</td><td>'+(q.assetDraw>0?'<span style="color:#f1c75b">'+man(q.assetDraw)+'</span>':'0万円')+'</td></tr>'}).join('');
 }
+function pdfValue(label,value){return '<div class="pdf-kpi"><span>'+label+'</span><b>'+value+'</b></div>'}
+function buildPdfReport(){
+  const r=sim(),now=r[0],last=r.at(-1);
+  const scenarioName=(typeof store!=='undefined'&&store.items&&store.items[store.current])?store.items[store.current].name:'現在のシナリオ';
+  const ages=[n('age'),35,40,45,50,55,60,65,70,75].filter((a,i,arr)=>a>=n('age')&&arr.indexOf(a)===i);
+  const milestoneRows=ages.map(a=>{const q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.cash)+'</td><td>'+man(q.nisa)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');
+  const cashRows=ages.map(a=>{const q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.income)+'</td><td>'+man(q.livingCost)+'</td><td>'+man(q.debtCost)+'</td><td>'+man(q.lifestyleCost)+'</td><td>'+man(q.savingCost)+'</td><td>'+man(q.assetDraw)+'</td></tr>'}).join('');
+  const ca0=n('c1m')/12;
+  const defs=[
+    {name:'1人目',exists:true,bornIn:0,uni:$('c1uni').value==='private'?'私立':'国公立'},
+    {name:'2人目',exists:$('c2').value==='1',bornIn:n('c2gap')-ca0,uni:$('c2uni').value==='private'?'私立':'国公立'},
+    {name:'3人目',exists:$('c2').value==='1'&&$('c3').value==='1',bornIn:n('c2gap')+n('c3gap')-ca0,uni:$('c3uni').value==='private'?'私立':'国公立'}
+  ];
+  const childRows=defs.map((d,i)=>{
+    if(!d.exists)return '<tr><td>'+d.name+'</td><td colspan="4">想定なし</td></tr>';
+    const y18=Math.max(0,Math.round(d.bornIn+18)),q18=r.find(x=>x.y===y18)||last;
+    return '<tr><td>'+d.name+'</td><td>'+d.uni+'</td><td>'+man(q18['child'+(i+1)])+'</td><td>'+man(last['child'+(i+1)])+'</td><td>'+n('allowance')+'万円/年</td></tr>';
+  }).join('');
+  let chartImg='';
+  try{chartImg=$('chart').toDataURL('image/png')}catch(e){}
+  const date=new Date().toLocaleDateString('ja-JP');
+  $('pdfReport').innerHTML='<div class="pdf-page">'+
+    '<div class="pdf-head"><h1>人生・資産形成シミュレーション結果</h1><div class="meta">シナリオ：'+scenarioName+'　出力日：'+date+'　単位：万円</div></div>'+
+    '<div class="pdf-kpis">'+
+      pdfValue('現在総資産',man(now.total))+
+      pdfValue('10年後',man((r.find(x=>x.y===10)||last).total))+
+      pdfValue('60歳',man((r.find(x=>x.age===60)||last).total))+
+      pdfValue('75歳',man(last.total))+
+    '</div>'+
+    (chartImg?'<div class="pdf-box"><h2>資産推移</h2><img class="pdf-chart" src="'+chartImg+'" alt="資産推移グラフ"></div>':'')+
+    '<div class="pdf-grid">'+
+      '<div class="pdf-box"><h2>主要前提</h2><table><tbody>'+
+        '<tr><td>現在年齢</td><td>'+n('age')+'歳</td></tr>'+
+        '<tr><td>給与収入終了年齢</td><td>'+n('workUntil')+'歳</td></tr>'+
+        '<tr><td>年金開始</td><td>'+n('pAge')+'歳</td></tr>'+
+        '<tr><td>世帯年金</td><td>'+n('pension')+'万円/月</td></tr>'+
+        '<tr><td>定年後基本生活費</td><td>'+n('retireLiving')+'万円/月</td></tr>'+
+        '<tr><td>定年後旅行・自由費</td><td>'+n('retireLifestyle')+'万円/月</td></tr>'+
+        '<tr><td>生活費インフレ</td><td>'+n('infl')+'%</td></tr>'+
+        '<tr><td>現金バッファ</td><td>'+n('buffer')+'万円</td></tr>'+
+      '</tbody></table></div>'+
+      '<div class="pdf-box"><h2>積立・運用前提</h2><table><tbody>'+
+        '<tr><td>NISA</td><td>'+n('nisaM')+'万円/月</td></tr>'+
+        '<tr><td>iDeCo</td><td>'+n('idecoM')+'万円/月</td></tr>'+
+        '<tr><td>小規模企業共済</td><td>'+n('kyosaiM')+'万円/月</td></tr>'+
+        '<tr><td>現金積立</td><td>'+n('cashM')+'万円/月</td></tr>'+
+        '<tr><td>株式想定利回り</td><td>'+n('rStock')+'%</td></tr>'+
+        '<tr><td>iDeCo想定利回り</td><td>'+n('rIdeco')+'%</td></tr>'+
+        '<tr><td>子ども資産利回り</td><td>'+n('rChild')+'%</td></tr>'+
+        '<tr><td>児童手当積立</td><td>'+n('allowance')+'万円/年・人</td></tr>'+
+      '</tbody></table></div>'+
+    '</div>'+
+    '<div class="pdf-box"><h2>資産の節目</h2><table><thead><tr><th>年齢</th><th>総資産</th><th>流動資産</th><th>現金</th><th>NISA</th><th>iDeCo・共済</th></tr></thead><tbody>'+milestoneRows+'</tbody></table></div>'+
+    '<div class="pdf-box"><h2>子ども資産（親資産とは別財布）</h2><table><thead><tr><th>子ども</th><th>大学</th><th>18歳時点</th><th>最終残高</th><th>積立前提</th></tr></thead><tbody>'+childRows+'</tbody></table></div>'+
+    '<div class="pdf-box pdf-break"><h2>主要年齢の年間収支</h2><table><thead><tr><th>年齢</th><th>収入</th><th>生活・子育て</th><th>返済</th><th>旅行・自由費</th><th>投資・貯蓄</th><th>資産取崩し</th></tr></thead><tbody>'+cashRows+'</tbody></table></div>'+
+    '<div class="pdf-box"><h2>75歳時点の資産内訳</h2><table><tbody>'+
+      [['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k]].map(x=>'<tr><td>'+x[0]+'</td><td>'+man(x[1])+'</td></tr>').join('')+
+    '</tbody></table></div>'+
+    '<div class="pdf-note">本資料は家計設計用の概算です。税・社会保険・保育料・児童手当・年金・投資収益等の将来額を保証するものではありません。子どもの児童手当積立資産は親の総資産に含めていません。</div>'+
+  '</div>';
+}
+function exportPdf(){calc();buildPdfReport();setTimeout(()=>window.print(),80)}
 function calc(){renderBudgetTotal();renderIncome();let r=sim(),now=r[0],ten=r.find(x=>x.y===10)||r.at(-1),sixty=r.find(x=>x.age===60)||r.at(-1),last=r.at(-1);$('s0').textContent=man(now.total);$('sc').textContent=man(now.cash);$('s10').textContent=man(ten.total);$('s60').textContent=man(sixty.total);$('sspend').textContent=man(last.spent);$('milestones').innerHTML=[35,40,45,50,55,60,65,70,75].filter(a=>a>=n('age')).map(a=>{let q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.total)+'</td><td>'+man(q.liquid)+'</td><td>'+man(q.locked)+'</td></tr>'}).join('');$('breakdown').innerHTML=[['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k],['母への残債',-last.mom]].map(a=>'<tr><td>'+a[0]+'</td><td>'+man(a[1])+'</td></tr>').join('');const ca0=n('c1m')/12,childDefs=[{name:'1人目',exists:true,bornIn:0},{name:'2人目',exists:$('c2').value==='1',bornIn:n('c2gap')-ca0},{name:'3人目',exists:$('c2').value==='1'&&$('c3').value==='1',bornIn:n('c2gap')+n('c3gap')-ca0}];$('childAssets').innerHTML=childDefs.map((d,i)=>{if(!d.exists)return '<tr><td>'+d.name+'</td><td colspan="2">なし</td></tr>';const nurseryRows=r.filter(x=>x.nurseryCost>0);$('nurserySummary').innerHTML=nurseryRows.length?nurseryRows.slice(0,5).map(q=>'<div class="status"><b>'+q.age+'歳</b>：年 '+man(q.nurseryCost)+'（判定用市民税所得割額 約'+Math.round(q.nurseryTax).toLocaleString()+'円）</div>').join(''):'<div class="status">現在の設定では保育料発生年はありません。</div>';let age18Y=Math.max(0,Math.round(d.bornIn+18)),q18=r.find(x=>x.y===age18Y)||last;return '<tr><td>'+d.name+'</td><td>'+man(last['child'+(i+1)])+'</td><td>'+man(q18['child'+(i+1)])+'</td></tr>'}).join('');$('freedom').innerHTML=[40,45,50,55,60].map(a=>{let q=r.find(x=>x.age===a);if(!q)return'';let ml=baseLivingMonthly()*Math.pow(1+n('infl')/100,a-n('age')),yc=q.liquid/(ml*12);return '<div class="status"><b>'+a+'歳</b>：流動資産 '+man(q.liquid)+' ／ 生活費約 '+yc.toFixed(1)+'年分</div>'}).join('')+'<div class="status">目標は仕事を辞めることではなく、<b>お金に困らず好きだから働ける状態</b>。</div>';renderCashflow(r);draw(r)}
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.t).classList.add('active');calc();renderCompare()});ids.forEach(id=>$(id).oninput=()=>{calc();markDirty()});$('calc').onclick=()=>{calc();renderCompare()};$('addEvent').onclick=()=>{addEvent();markDirty()};$('addBudgetItem').onclick=()=>{addBudgetItem();markDirty()};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.t).classList.add('active');calc();renderCompare()});ids.forEach(id=>$(id).oninput=()=>{calc();markDirty()});$('calc').onclick=()=>{calc();renderCompare()};$('pdfExport').onclick=exportPdf;window.addEventListener('beforeprint',buildPdfReport);$('addEvent').onclick=()=>{addEvent();markDirty()};$('addBudgetItem').onclick=()=>{addBudgetItem();markDirty()};
 
 const BASE_VALUES=Object.fromEntries(ids.map(id=>[id,$(id).value]));
 function snapshot(){return {v:Object.fromEntries(ids.map(id=>[id,$(id).value])),e:events(),cb:customBudget()}}
