@@ -37,7 +37,7 @@
 </div></div>
 <div class="card"><h2>生活・目標</h2><div class="grid g2">
 <div class="field"><label>現在年齢</label><input id="age" value="33" type="number"></div>
-<div class="field"><label>働く想定年齢</label><input id="workUntil" value="60" type="number"></div>
+<div class="field"><label>給与収入終了年齢（定年）</label><input id="workUntil" value="60" type="number"></div>
 <div class="field"><label>生活費インフレ</label><input id="infl" value="2" step=".1" type="number"><span class="u">%/年</span></div>
 <div class="field"><label>現金バッファ</label><input id="buffer" value="180" type="number"><span class="u">万円</span></div>
 <div class="field"><label>旅行費</label><input id="travel" value="30" type="number"><span class="u">万円/年・別枠</span></div>
@@ -157,7 +157,7 @@
 <div class="field"><label>Bitcoin</label><input id="rBtc" value="0" type="number"><span class="u">%/年</span></div>
 <div class="field"><label>共済</label><input id="rK" value="1" step=".1" type="number"><span class="u">%/年 比較用</span></div>
 </div></div>
-<div class="card"><h2>老後</h2><div class="grid g2"><div class="field"><label>年金開始</label><input id="pAge" value="65" type="number"></div><div class="field"><label>世帯年金概算</label><input id="pension" value="20" type="number"><span class="u">万円/月</span></div></div><div class="note">年金は参考扱い。老後資金はiDeCo・NISA・共済を中心に見る設計です。</div></div>
+<div class="card"><h2>老後</h2><div class="grid g2"><div class="field"><label>年金開始</label><input id="pAge" value="65" type="number"></div><div class="field"><label>世帯年金手取り概算</label><input id="pension" value="20" type="number"><span class="u">万円/月</span></div></div><div class="note">定年以降は給与収入0円として計算。年金開始後は設定した世帯年金を収入に加え、不足分は現金→NISA→特定口座→Bitcoin→iDeCo→共済の順で取り崩します。</div></div>
 </div></section>
 
 <section class="sec" id="debt"><div class="grid g2">
@@ -183,7 +183,7 @@
 <section class="sec" id="result"><div class="grid g2">
 <div class="card"><h2>資産推移</h2><div class="chartWrap"><canvas id="chart" width="900" height="320"></canvas><div id="chartTip" class="chartTip"></div></div><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済 / 紫:NISA / 白:現金。カーソルを合わせるか、スマホではタップすると詳細が見られます。</div></div>
 <div class="card"><h2>経済的自由度</h2><div id="freedom"></div></div>
-<div class="card" style="grid-column:1/-1"><h2>世帯収支の推移</h2><div class="muted">各年の収入・支出・積立を年額で表示します。NISA・iDeCo・小規模企業共済・現金の「基本積立」は先取りで維持し、収入で足りない場合は現金等を取り崩す計算です。自動増額分は余裕がある場合のみ追加します。</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>年齢</th><th>世帯収入</th><th>生活・子育て</th><th>うち保育料</th><th>返済</th><th>旅行・自由費</th><th>親の投資・貯蓄</th><th>子ども別財布</th><th>積立後収支</th><th>資産取崩し</th></tr></thead><tbody id="cashflowTable"></tbody></table></div></div>
+<div class="card" style="grid-column:1/-1"><h2>世帯収支の推移</h2><div class="muted">各年の収入・支出・積立を年額で表示します。現役中は現金バッファを優先しながら積立し、定年後は給与収入0円。年金開始後は年金を収入に加え、不足分を資産から取り崩します。</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>年齢</th><th>世帯収入</th><th>生活・子育て</th><th>うち保育料</th><th>返済</th><th>旅行・自由費</th><th>親の投資・貯蓄</th><th>子ども別財布</th><th>積立後収支</th><th>資産取崩し</th></tr></thead><tbody id="cashflowTable"></tbody></table></div></div>
 <div class="card"><h2>節目</h2><div class="scroll"><table><thead><tr><th>年齢</th><th>総資産</th><th>流動</th><th>拘束</th></tr></thead><tbody id="milestones"></tbody></table></div></div>
 <div class="card"><h2>75歳時点内訳</h2><div class="scroll"><table><tbody id="breakdown"></tbody></table></div></div>
 <div class="card"><h2>堺市 保育料概算</h2><div id="nurserySummary"></div><div class="muted">0〜2歳の第1子のみ。第2子以降と3〜5歳は保育料0円として計算。</div></div>
@@ -348,23 +348,23 @@ function addEvent(e={name:'大型支出',y:5,amt:50}){let d=document.createEleme
 function sim(){
  let age=n('age'),years=Math.max(1,75-age),cash=n('cashH')+n('cashW'),loan=n('loan'),tax=n('taxable'),btc=n('btc'),ideco=n('ideco'),nisa=n('nisa'),k=n('kyosai'),mom=n('momDebt'),spent=0,childWallet=[0,0,0],out=[],ev=events(),rs=mr(n('rStock')),ri=mr(n('rIdeco')),rb=mr(n('rBtc')),rk=mr(n('rK')),rc=mr(n('rChild'));
  for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent,child1:childWallet[0],child2:childWallet[1],child3:childWallet[2],childTotal:childWallet.reduce((a,b)=>a+b,0),income:0,livingCost:0,debtCost:0,lifestyleCost:0,savingCost:0,childSaving:0,netCashflow:0,assetDraw:0,nurseryCost:0,nurseryTax:0});if(y===years)break;
-  let returned=y>=n('returnYear'),living=baseLivingMonthly()*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=collegePremium(y),nursery=nurseryMonthly(y,returned),nurseryCost=nursery.total,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
+  let currentAge=age+y,retired=currentAge>=n('workUntil'),returned=y>=n('returnYear'),living=baseLivingMonthly()*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=collegePremium(y),nursery=nurseryMonthly(y,returned),nurseryCost=nursery.total,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
   const agesNow=childAges(y);
   const allowanceMonthlyByChild=agesNow.map(a=>(a>=0&&a<18)?n('allowance')/12:0);
   const allowanceMonthly=allowanceMonthlyByChild.reduce((a,b)=>a+b,0);
-  const monthlyIncome=householdPay(returned,age+y).houseNetM+(returned?n('wifeGain'):0);
+  const monthlyIncome=retired?(currentAge>=n('pAge')?n('pension'):0):(householdPay(returned,currentAge).houseNetM+(returned?n('wifeGain'):0));
   const monthlyNonSaving=living+cc+college+nurseryCost+old+stu+mp+trav+free;
   const preSaveSurplus=monthlyIncome-monthlyNonSaving;
 
   // 現金バッファを優先維持する。
   // iDeCo・共済は基本維持、NISAは家計余力に応じて調整する。
   const buffer=n('buffer');
-  let cm=n('cashM'),baseNisa=n('nisaM'),nm=baseNisa,im=n('idecoM'),km=n('kyosaiM');
+  let cm=retired?0:n('cashM'),baseNisa=retired?0:n('nisaM'),nm=baseNisa,im=retired?0:n('idecoM'),km=retired?0:n('kyosaiM');
 
   // 自動増額は余裕がある場合のみ。
   let desiredNisa=0,desiredIdeco=0,desiredKyosai=0;
-  if(cash>=buffer) desiredNisa+=n('nisaBoost');
-  if(returned){
+  if(!retired&&cash>=buffer) desiredNisa+=n('nisaBoost');
+  if(!retired&&returned){
     desiredNisa+=n('nisaReturn');
     desiredIdeco=Math.max(0,n('idecoReturn')-im);
     desiredKyosai=Math.max(0,n('kyosaiReturn')-km);
@@ -406,27 +406,29 @@ function sim(){
 
   let planned=cm+nm+im+km;
   let shortage=Math.max(0,planned-preSaveSurplus);
+  let cashDraw=0,forcedDraw=0;
 
-  // 現金は原則バッファまで守る。必要ならNISAをさらに減らす。
-  if(shortage>0){
-    const projectedCash=cash+(cm-shortage)*12;
-    if(projectedCash<buffer){
-      const maxNisaCut=Math.max(0,nm);
-      const needProtect=(buffer-projectedCash)/12;
-      const cut=Math.min(maxNisaCut,Math.max(shortage,needProtect));
-      nm-=cut;
-      planned=cm+nm+im+km;
-      shortage=Math.max(0,planned-preSaveSurplus);
+  if(retired){
+    // 定年後は積立を行わず、生活費不足分を資産から取り崩す。
+    planned=0;
+    shortage=Math.max(0,-preSaveSurplus);
+  }else{
+    // 現役中は現金バッファを優先維持。必要ならNISA積立をさらに減らす。
+    if(shortage>0){
+      const projectedCash=cash+(cm-shortage)*12;
+      if(projectedCash<buffer){
+        const maxNisaCut=Math.max(0,nm);
+        const needProtect=(buffer-projectedCash)/12;
+        const cut=Math.min(maxNisaCut,Math.max(shortage,needProtect));
+        nm-=cut;
+        planned=cm+nm+im+km;
+        shortage=Math.max(0,planned-preSaveSurplus);
+      }
     }
+    const availableCashDraw=Math.max(0,(cash-buffer)/12);
+    cashDraw=Math.min(shortage,availableCashDraw);
+    forcedDraw=Math.max(0,shortage-cashDraw);
   }
-
-  // 最終的に不足する場合のみ現金を取り崩す。
-  const availableCashDraw=Math.max(0,(cash-buffer)/12);
-  const cashDraw=Math.min(shortage,availableCashDraw);
-  const remainingShortage=Math.max(0,shortage-cashDraw);
-
-  // バッファを割ってなお不足する場合は、NISA取り崩しへ回すため別管理。
-  const forcedDraw=remainingShortage;
 
   const allowanceAnnual=allowanceMonthly*12;
   const incomeAnnual=monthlyIncome*12;
@@ -435,12 +437,29 @@ function sim(){
   const lifestyleAnnual=(trav+free)*12;
   const savingAnnual=planned*12;
   const netAnnual=incomeAnnual-livingAnnual-debtAnnual-lifestyleAnnual-savingAnnual;
-  Object.assign(out[out.length-1],{income:incomeAnnual,livingCost:livingAnnual,debtCost:debtAnnual,lifestyleCost:lifestyleAnnual,savingCost:savingAnnual,childSaving:allowanceAnnual,netCashflow:netAnnual,assetDraw:(cashDraw+forcedDraw)*12,nurseryCost:nurseryCost*12,nurseryTax:nursery.tax});
-  for(let m=0;m<12;m++){tax*=1+rs;nisa=nisa*(1+rs)+nm-forcedDraw;ideco=ideco*(1+ri)+im;btc*=1+rb;k=k*(1+rk)+km;cash+=cm-cashDraw;for(let ci=0;ci<3;ci++){childWallet[ci]=childWallet[ci]*(1+rc)+(allowanceMonthlyByChild[ci]||0)}spent+=trav+free;if(mom>0)mom=Math.max(0,mom-mp)}
+  Object.assign(out[out.length-1],{income:incomeAnnual,livingCost:livingAnnual,debtCost:debtAnnual,lifestyleCost:lifestyleAnnual,savingCost:savingAnnual,childSaving:allowanceAnnual,netCashflow:netAnnual,assetDraw:shortage*12,nurseryCost:nurseryCost*12,nurseryTax:nursery.tax,retired});
+  for(let m=0;m<12;m++){
+    tax*=1+rs;nisa*=1+rs;ideco*=1+ri;btc*=1+rb;k*=1+rk;
+    if(retired){
+      const monthlyGap=Math.max(0,monthlyNonSaving-monthlyIncome);
+      const monthlySurplus=Math.max(0,monthlyIncome-monthlyNonSaving);
+      cash+=monthlySurplus;
+      let need=monthlyGap,take=Math.min(cash,need);cash-=take;need-=take;
+      take=Math.min(nisa,need);nisa-=take;need-=take;
+      take=Math.min(tax,need);tax-=take;need-=take;
+      take=Math.min(btc,need);btc-=take;need-=take;
+      take=Math.min(ideco,need);ideco-=take;need-=take;
+      take=Math.min(k,need);k-=take;need-=take;
+    }else{
+      nisa+=nm-forcedDraw;ideco+=im;k+=km;cash+=cm-cashDraw;
+    }
+    for(let ci=0;ci<3;ci++){childWallet[ci]=childWallet[ci]*(1+rc)+(allowanceMonthlyByChild[ci]||0)}
+    spent+=trav+free;if(mom>0)mom=Math.max(0,mom-mp)
+  }
   if(Math.round(y+1)===Math.round(n('carY'))){cash-=Math.max(0,n('carBuy')-n('carSell'))}
   if(n('kominka')>0&&Math.round(y+1)===Math.round(n('kominkaY')))cash-=n('kominka');
   ev.filter(e=>Math.round(e.y)===Math.round(y+1)).forEach(e=>cash-=e.amt);
-  if(cash<0){nisa+=cash;cash=0}if(nisa<0){tax+=nisa;nisa=0}if(tax<0){loan+=tax;tax=0}if(loan<0)loan=0;
+  if(!retired){if(cash<0){nisa+=cash;cash=0}if(nisa<0){tax+=nisa;nisa=0}if(tax<0){loan+=tax;tax=0}if(loan<0)loan=0}else{cash=Math.max(0,cash);nisa=Math.max(0,nisa);tax=Math.max(0,tax);btc=Math.max(0,btc);ideco=Math.max(0,ideco);k=Math.max(0,k)}
  } return out
 }
 let chartState={rows:[],pad:{l:55,r:18,t:20,b:35},max:1,selected:null};
