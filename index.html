@@ -549,6 +549,9 @@ function renderCashflow(r){
   $('cashflowTable').innerHTML=ages.map(a=>{let q=r.find(x=>x.age===a)||r.at(-1);return '<tr><td>'+a+'歳</td><td>'+man(q.income)+'</td><td>'+man(q.livingCost)+'</td><td>'+man(q.nurseryCost)+'</td><td>'+man(q.debtCost)+'</td><td>'+man(q.lifestyleCost)+'</td><td>'+man(q.savingCost)+'</td><td>'+man(q.childSaving)+'</td><td>'+man(q.netCashflow)+'</td><td>'+(q.assetDraw>0?'<span style="color:#f1c75b">'+man(q.assetDraw)+'</span>':'0万円')+'</td></tr>'}).join('');
 }
 function pdfValue(label,value){return '<div class="pdf-kpi"><span>'+label+'</span><b>'+value+'</b></div>'}
+function pdfRows(items){
+  return items.map(x=>'<tr><td>'+x[0]+'</td><td>'+x[1]+'</td></tr>').join('');
+}
 function buildPdfReport(){
   const r=sim(),now=r[0],last=r.at(-1);
   const scenarioName=(typeof store!=='undefined'&&store.items&&store.items[store.current])?store.items[store.current].name:'現在のシナリオ';
@@ -557,15 +560,60 @@ function buildPdfReport(){
   const cashRows=ages.map(a=>{const q=r.find(x=>x.age===a)||last;return '<tr><td>'+a+'歳</td><td>'+man(q.income)+'</td><td>'+man(q.livingCost)+'</td><td>'+man(q.debtCost)+'</td><td>'+man(q.lifestyleCost)+'</td><td>'+man(q.savingCost)+'</td><td>'+man(q.assetDraw)+'</td></tr>'}).join('');
   const ca0=n('c1m')/12;
   const defs=[
-    {name:'1人目',exists:true,bornIn:0,uni:$('c1uni').value==='private'?'私立':'国公立'},
-    {name:'2人目',exists:$('c2').value==='1',bornIn:n('c2gap')-ca0,uni:$('c2uni').value==='private'?'私立':'国公立'},
-    {name:'3人目',exists:$('c2').value==='1'&&$('c3').value==='1',bornIn:n('c2gap')+n('c3gap')-ca0,uni:$('c3uni').value==='private'?'私立':'国公立'}
+    {name:'1人目',exists:true,bornIn:0,uni:$('c1uni').value==='private'?'私立':'国公立',nursery:n('c1nursery')},
+    {name:'2人目',exists:$('c2').value==='1',bornIn:n('c2gap')-ca0,uni:$('c2uni').value==='private'?'私立':'国公立',nursery:n('c2nursery')},
+    {name:'3人目',exists:$('c2').value==='1'&&$('c3').value==='1',bornIn:n('c2gap')+n('c3gap')-ca0,uni:$('c3uni').value==='private'?'私立':'国公立',nursery:n('c3nursery')}
   ];
   const childRows=defs.map((d,i)=>{
-    if(!d.exists)return '<tr><td>'+d.name+'</td><td colspan="4">想定なし</td></tr>';
+    if(!d.exists)return '<tr><td>'+d.name+'</td><td colspan="5">想定なし</td></tr>';
     const y18=Math.max(0,Math.round(d.bornIn+18)),q18=r.find(x=>x.y===y18)||last;
-    return '<tr><td>'+d.name+'</td><td>'+d.uni+'</td><td>'+man(q18['child'+(i+1)])+'</td><td>'+man(last['child'+(i+1)])+'</td><td>'+n('allowance')+'万円/年</td></tr>';
+    return '<tr><td>'+d.name+'</td><td>'+d.uni+'</td><td>'+d.nursery+'歳</td><td>'+man(q18['child'+(i+1)])+'</td><td>'+man(last['child'+(i+1)])+'</td><td>'+n('allowance')+'万円/年</td></tr>';
   }).join('');
+  const basicBudget=[
+    ['住居',n('bHousing')+'万円/月'],['自動車保険',n('bCarIns')+'万円/月'],['ガソリン・高速',n('bFuel')+'万円/月'],
+    ['駐車場',n('bParking')+'万円/月'],['税・車検積立',n('bCarTax')+'万円/月'],['タイヤ・消耗品',n('bCarConsum')+'万円/月'],
+    ['食費',n('bFood')+'万円/月'],['日用品',n('bDaily')+'万円/月'],['妻こづかい',n('bWifePocket')+'万円/月'],
+    ['電気',n('bElec')+'万円/月'],['ガス',n('bGas')+'万円/月'],['水道',n('bWater')+'万円/月'],
+    ['携帯',n('bMobile')+'万円/月'],['インターネット',n('bNet')+'万円/月'],['保険',n('bInsurance')+'万円/月']
+  ];
+  customBudget().forEach(x=>basicBudget.push([x.name,Number(x.amt||0)+'万円/月']));
+  const assetAssumptions=[
+    ['夫現金',n('cashH')+'万円'],['妻現金',n('cashW')+'万円'],['役員借入金',n('loan')+'万円'],['特定口座',n('taxable')+'万円'],
+    ['Bitcoin',n('btc')+'万円'],['iDeCo',n('ideco')+'万円'],['NISA',n('nisa')+'万円'],['小規模企業共済',n('kyosai')+'万円']
+  ];
+  const incomeAssumptions=[
+    ['夫役員報酬（復職前）',n('execSalaryHBefore')+'万円/月'],['妻役員報酬（復職前）',n('execSalaryWBefore')+'万円/月'],
+    ['夫役員報酬（復職後）',n('execSalaryHAfter')+'万円/月'],['妻役員報酬（復職後）',n('execSalaryWAfter')+'万円/月'],
+    ['妻復職',n('returnYear')+'年後'],['妻復職後の家計手取り増加',n('wifeGain')+'万円/月'],
+    ['夫役員賞与',n('bonusH')+'万円/年'],['妻役員賞与',n('bonusW')+'万円/年'],
+    ['賞与設定',$('bonusMode').value==='none'?'なし':'毎年'],['給与収入終了年齢',n('workUntil')+'歳']
+  ];
+  const savingAssumptions=[
+    ['NISA積立',n('nisaM')+'万円/月'],['iDeCo積立',n('idecoM')+'万円/月'],['小規模企業共済',n('kyosaiM')+'万円/月'],['現金積立',n('cashM')+'万円/月'],
+    ['現金達成後 NISA加算',n('nisaBoost')+'万円/月'],['復職後 NISA加算',n('nisaReturn')+'万円/月'],
+    ['復職後 iDeCo',n('idecoReturn')+'万円/月'],['復職後 共済',n('kyosaiReturn')+'万円/月'],
+    ['株式想定利回り',n('rStock')+'%/年'],['iDeCo想定利回り',n('rIdeco')+'%/年'],['Bitcoin想定利回り',n('rBtc')+'%/年'],
+    ['共済比較利回り',n('rK')+'%/年'],['子ども資産利回り',n('rChild')+'%/年'],['現金バッファ',n('buffer')+'万円']
+  ];
+  const familyAssumptions=[
+    ['1人目現在月齢',n('c1m')+'か月'],['2人目',$('c2').value==='1'?'想定あり':'なし'],['2人目年齢差',n('c2gap')+'歳'],
+    ['3人目',$('c3').value==='1'?'想定あり':'なし'],['3人目年齢差',n('c3gap')+'歳'],['児童手当積立',n('allowance')+'万円/年・人'],
+    ['保育時間',$('nurseryHours').value==='short'?'短時間':'標準時間'],['保育料計算',$('nurseryCalc').value==='manual'?'市民税所得割額を手入力':'収入から自動概算'],
+    ['保育料手入力用市民税所得割額',n('nurseryTaxManual').toLocaleString()+'円/年']
+  ];
+  const retirementAssumptions=[
+    ['年金開始',n('pAge')+'歳'],['世帯年金手取り概算',n('pension')+'万円/月'],['定年後基本生活費',n('retireLiving')+'万円/月'],
+    ['定年後旅行・自由費',n('retireLifestyle')+'万円/月'],['生活費インフレ',n('infl')+'%/年'],
+    ['現役中旅行費',n('travel')+'万円/年'],['流動資産基準達成後旅行費',n('travelRich')+'万円/年'],['夫婦自由費',n('free')+'万円/年'],
+    ['旅行費増額の流動資産基準',n('rich')+'万円']
+  ];
+  const debtAssumptions=[
+    ['母への残債',n('momDebt')+'万円'],['母への返済',n('momPay')+'万円/月'],['復職後返済',n('momPay2')+'万円/月'],
+    ['旧車返済',n('oldCar')+'万円/月'],['旧車残期間',n('oldCarY')+'年'],['奨学金',n('student')+'万円/月'],['奨学金残期間',n('studentY')+'年'],
+    ['車買替',n('carY')+'年後'],['車売却額',n('carSell')+'万円'],['次車購入額',n('carBuy')+'万円'],
+    ['古民家',n('kominkaY')+'年後'],['古民家予算',n('kominka')+'万円']
+  ];
+  const eventRows=events().length?events().map(e=>'<tr><td>'+e.name+'</td><td>'+e.y+'年後</td><td>'+e.amt+'万円</td></tr>').join(''):'<tr><td colspan="3">追加イベントなし</td></tr>';
   let chartImg='';
   try{chartImg=$('chart').toDataURL('image/png')}catch(e){}
   const date=new Date().toLocaleDateString('ja-JP');
@@ -578,30 +626,19 @@ function buildPdfReport(){
       pdfValue('75歳',man(last.total))+
     '</div>'+
     (chartImg?'<div class="pdf-box"><h2>資産推移</h2><img class="pdf-chart" src="'+chartImg+'" alt="資産推移グラフ"></div>':'')+
-    '<div class="pdf-grid">'+
-      '<div class="pdf-box"><h2>主要前提</h2><table><tbody>'+
-        '<tr><td>現在年齢</td><td>'+n('age')+'歳</td></tr>'+
-        '<tr><td>給与収入終了年齢</td><td>'+n('workUntil')+'歳</td></tr>'+
-        '<tr><td>年金開始</td><td>'+n('pAge')+'歳</td></tr>'+
-        '<tr><td>世帯年金</td><td>'+n('pension')+'万円/月</td></tr>'+
-        '<tr><td>定年後基本生活費</td><td>'+n('retireLiving')+'万円/月</td></tr>'+
-        '<tr><td>定年後旅行・自由費</td><td>'+n('retireLifestyle')+'万円/月</td></tr>'+
-        '<tr><td>生活費インフレ</td><td>'+n('infl')+'%</td></tr>'+
-        '<tr><td>現金バッファ</td><td>'+n('buffer')+'万円</td></tr>'+
-      '</tbody></table></div>'+
-      '<div class="pdf-box"><h2>積立・運用前提</h2><table><tbody>'+
-        '<tr><td>NISA</td><td>'+n('nisaM')+'万円/月</td></tr>'+
-        '<tr><td>iDeCo</td><td>'+n('idecoM')+'万円/月</td></tr>'+
-        '<tr><td>小規模企業共済</td><td>'+n('kyosaiM')+'万円/月</td></tr>'+
-        '<tr><td>現金積立</td><td>'+n('cashM')+'万円/月</td></tr>'+
-        '<tr><td>株式想定利回り</td><td>'+n('rStock')+'%</td></tr>'+
-        '<tr><td>iDeCo想定利回り</td><td>'+n('rIdeco')+'%</td></tr>'+
-        '<tr><td>子ども資産利回り</td><td>'+n('rChild')+'%</td></tr>'+
-        '<tr><td>児童手当積立</td><td>'+n('allowance')+'万円/年・人</td></tr>'+
-      '</tbody></table></div>'+
-    '</div>'+
     '<div class="pdf-box"><h2>資産の節目</h2><table><thead><tr><th>年齢</th><th>総資産</th><th>流動資産</th><th>現金</th><th>NISA</th><th>iDeCo・共済</th></tr></thead><tbody>'+milestoneRows+'</tbody></table></div>'+
-    '<div class="pdf-box"><h2>子ども資産（親資産とは別財布）</h2><table><thead><tr><th>子ども</th><th>大学</th><th>18歳時点</th><th>最終残高</th><th>積立前提</th></tr></thead><tbody>'+childRows+'</tbody></table></div>'+
+    '<div class="pdf-box"><h2>子ども資産（親資産とは別財布）</h2><table><thead><tr><th>子ども</th><th>大学</th><th>保育開始</th><th>18歳時点</th><th>最終残高</th><th>積立前提</th></tr></thead><tbody>'+childRows+'</tbody></table></div>'+
+    '<div class="pdf-box pdf-break"><h2>前提設定一覧</h2><div class="pdf-note" style="margin:0 0 8px">このページは、シミュレーション実行時に入力されていた設定値です。</div></div>'+
+    '<div class="pdf-grid">'+
+      '<div class="pdf-box"><h2>現在の資産</h2><table><tbody>'+pdfRows(assetAssumptions)+'</tbody></table></div>'+
+      '<div class="pdf-box"><h2>収入・働き方</h2><table><tbody>'+pdfRows(incomeAssumptions)+'</tbody></table></div>'+
+      '<div class="pdf-box"><h2>基本生活費（月額）</h2><table><tbody>'+pdfRows(basicBudget)+'</tbody></table></div>'+
+      '<div class="pdf-box"><h2>積立・運用</h2><table><tbody>'+pdfRows(savingAssumptions)+'</tbody></table></div>'+
+      '<div class="pdf-box"><h2>子ども・保育</h2><table><tbody>'+pdfRows(familyAssumptions)+'</tbody></table></div>'+
+      '<div class="pdf-box"><h2>老後・生活設計</h2><table><tbody>'+pdfRows(retirementAssumptions)+'</tbody></table></div>'+
+      '<div class="pdf-box"><h2>返済・大型支出</h2><table><tbody>'+pdfRows(debtAssumptions)+'</tbody></table></div>'+
+      '<div class="pdf-box"><h2>追加イベント</h2><table><thead><tr><th>名称</th><th>時期</th><th>金額</th></tr></thead><tbody>'+eventRows+'</tbody></table></div>'+
+    '</div>'+
     '<div class="pdf-box pdf-break"><h2>主要年齢の年間収支</h2><table><thead><tr><th>年齢</th><th>収入</th><th>生活・子育て</th><th>返済</th><th>旅行・自由費</th><th>投資・貯蓄</th><th>資産取崩し</th></tr></thead><tbody>'+cashRows+'</tbody></table></div>'+
     '<div class="pdf-box"><h2>75歳時点の資産内訳</h2><table><tbody>'+
       [['現金',last.cash],['役員借入金',last.loan],['特定口座',last.tax],['NISA',last.nisa],['Bitcoin',last.btc],['iDeCo',last.ideco],['小規模企業共済',last.k]].map(x=>'<tr><td>'+x[0]+'</td><td>'+man(x[1])+'</td></tr>').join('')+
