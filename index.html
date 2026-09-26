@@ -157,7 +157,12 @@
 <div class="field"><label>Bitcoin</label><input id="rBtc" value="0" type="number"><span class="u">%/年</span></div>
 <div class="field"><label>共済</label><input id="rK" value="1" step=".1" type="number"><span class="u">%/年 比較用</span></div>
 </div></div>
-<div class="card"><h2>老後</h2><div class="grid g2"><div class="field"><label>年金開始</label><input id="pAge" value="65" type="number"></div><div class="field"><label>世帯年金手取り概算</label><input id="pension" value="20" type="number"><span class="u">万円/月</span></div></div><div class="note">定年以降は給与収入0円として計算。年金開始後は設定した世帯年金を収入に加え、不足分は現金→NISA→特定口座→Bitcoin→iDeCo→共済の順で取り崩します。</div></div>
+<div class="card"><h2>老後</h2><div class="grid g2">
+<div class="field"><label>年金開始</label><input id="pAge" value="65" type="number"></div>
+<div class="field"><label>世帯年金手取り概算</label><input id="pension" value="20" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>定年後の基本生活費</label><input id="retireLiving" value="20" step=".5" type="number"><span class="u">万円/月</span></div>
+<div class="field"><label>定年後の旅行・自由費</label><input id="retireLifestyle" value="3" step=".5" type="number"><span class="u">万円/月</span></div>
+</div><div class="note">定年以降は給与収入0円。基本生活費は現在の家計内訳ではなく、ここで設定した老後生活費に切り替えます。子どもの通常生活費は独立後は自動で0円になりますが、大学在学中など年齢条件に該当する場合は別途残ります。</div></div>
 </div></section>
 
 <section class="sec" id="debt"><div class="grid g2">
@@ -183,7 +188,7 @@
 <section class="sec" id="result"><div class="grid g2">
 <div class="card"><h2>資産推移</h2><div class="chartWrap"><canvas id="chart" width="900" height="320"></canvas><div id="chartTip" class="chartTip"></div></div><div class="muted">青:総資産 / 緑:流動資産 / 黄:iDeCo・共済 / 紫:NISA / 白:現金。カーソルを合わせるか、スマホではタップすると詳細が見られます。</div></div>
 <div class="card"><h2>経済的自由度</h2><div id="freedom"></div></div>
-<div class="card" style="grid-column:1/-1"><h2>世帯収支の推移</h2><div class="muted">各年の収入・支出・積立を年額で表示します。現役中は現金バッファを優先しながら積立し、定年後は給与収入0円。年金開始後は年金を収入に加え、不足分を資産から取り崩します。</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>年齢</th><th>世帯収入</th><th>生活・子育て</th><th>うち保育料</th><th>返済</th><th>旅行・自由費</th><th>親の投資・貯蓄</th><th>子ども別財布</th><th>積立後収支</th><th>資産取崩し</th></tr></thead><tbody id="cashflowTable"></tbody></table></div></div>
+<div class="card" style="grid-column:1/-1"><h2>世帯収支の推移</h2><div class="muted">各年の収入・支出・積立を年額で表示します。現役中は現在の家計内訳を使い、定年後は「定年後の基本生活費・旅行自由費」に切り替えます。定年後は給与収入0円、年金開始後は年金を収入に加え、不足分を資産から取り崩します。</div><div class="scroll" style="margin-top:8px"><table><thead><tr><th>年齢</th><th>世帯収入</th><th>生活・子育て</th><th>うち保育料</th><th>返済</th><th>旅行・自由費</th><th>親の投資・貯蓄</th><th>子ども別財布</th><th>積立後収支</th><th>資産取崩し</th></tr></thead><tbody id="cashflowTable"></tbody></table></div></div>
 <div class="card"><h2>節目</h2><div class="scroll"><table><thead><tr><th>年齢</th><th>総資産</th><th>流動</th><th>拘束</th></tr></thead><tbody id="milestones"></tbody></table></div></div>
 <div class="card"><h2>75歳時点内訳</h2><div class="scroll"><table><tbody id="breakdown"></tbody></table></div></div>
 <div class="card"><h2>堺市 保育料概算</h2><div id="nurserySummary"></div><div class="muted">0〜2歳の第1子のみ。第2子以降と3〜5歳は保育料0円として計算。</div></div>
@@ -194,7 +199,7 @@
 </div>
 <script>
 const $=id=>document.getElementById(id), n=id=>Number($(id).value||0), man=x=>Math.round(x).toLocaleString()+'万円';
-const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryHBefore','execSalaryWBefore','execSalaryHAfter','execSalaryWAfter','wifeSocial','returnYear','wifeSalary','wifeGain','bonusH','bonusW','bonusMode','c1m','c1uni','c1nursery','c2','c2gap','c2uni','c2nursery','c3','c3gap','c3uni','c3nursery','nurseryHours','nurseryCalc','nurseryTaxManual','allowance','rChild','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
+const ids=['cashH','cashW','loan','taxable','btc','ideco','nisa','kyosai','age','workUntil','infl','travel','travelRich','free','buffer','bHousing','bCarIns','bFuel','bParking','bCarTax','bCarConsum','bFood','bDaily','bWifePocket','bElec','bGas','bWater','bMobile','bNet','bInsurance','execSalaryHBefore','execSalaryWBefore','execSalaryHAfter','execSalaryWAfter','wifeSocial','returnYear','wifeSalary','wifeGain','bonusH','bonusW','bonusMode','c1m','c1uni','c1nursery','c2','c2gap','c2uni','c2nursery','c3','c3gap','c3uni','c3nursery','nurseryHours','nurseryCalc','nurseryTaxManual','allowance','rChild','nisaM','idecoM','kyosaiM','cashM','nisaBoost','nisaReturn','idecoReturn','kyosaiReturn','rich','rStock','rIdeco','rBtc','rK','pAge','pension','retireLiving','retireLifestyle','momDebt','momPay','momPay2','oldCar','oldCarY','student','studentY','carY','carSell','carBuy','kominkaY','kominka'];
 function childAges(y){let a=n('c1m')/12+y,r=[a];if($('c2').value==='1'){r.push(a-n('c2gap'));if($('c3').value==='1')r.push(a-n('c2gap')-n('c3gap'));}return r}
 function childCost(a){if(a<0)return 0;if(a<3)return 2;if(a<6)return 3;if(a<12)return 4;if(a<18)return 6;if(a<23)return 10;return 0}
 function collegePremium(y){
@@ -348,7 +353,15 @@ function addEvent(e={name:'大型支出',y:5,amt:50}){let d=document.createEleme
 function sim(){
  let age=n('age'),years=Math.max(1,75-age),cash=n('cashH')+n('cashW'),loan=n('loan'),tax=n('taxable'),btc=n('btc'),ideco=n('ideco'),nisa=n('nisa'),k=n('kyosai'),mom=n('momDebt'),spent=0,childWallet=[0,0,0],out=[],ev=events(),rs=mr(n('rStock')),ri=mr(n('rIdeco')),rb=mr(n('rBtc')),rk=mr(n('rK')),rc=mr(n('rChild'));
  for(let y=0;y<=years;y++){let liquid=cash+tax+nisa+btc,locked=ideco+k;out.push({y,age:age+y,total:liquid+locked+loan,liquid,locked,cash,loan,tax,btc,ideco,nisa,k,mom,spent,child1:childWallet[0],child2:childWallet[1],child3:childWallet[2],childTotal:childWallet.reduce((a,b)=>a+b,0),income:0,livingCost:0,debtCost:0,lifestyleCost:0,savingCost:0,childSaving:0,netCashflow:0,assetDraw:0,nurseryCost:0,nurseryTax:0});if(y===years)break;
-  let currentAge=age+y,retired=currentAge>=n('workUntil'),returned=y>=n('returnYear'),living=baseLivingMonthly()*Math.pow(1+n('infl')/100,y),cc=childAges(y).reduce((s,a)=>s+childCost(a),0),college=collegePremium(y),nursery=nurseryMonthly(y,returned),nurseryCost=nursery.total,old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,mp=mom>0?(returned?n('momPay2'):n('momPay')):0,trav=(liquid>=n('rich')?n('travelRich'):n('travel'))/12,free=n('free')/12;
+  let currentAge=age+y,retired=currentAge>=n('workUntil'),returned=y>=n('returnYear'),
+      living=(retired?n('retireLiving'):baseLivingMonthly()*Math.pow(1+n('infl')/100,y)),
+      cc=childAges(y).reduce((s,a)=>s+childCost(a),0),
+      college=collegePremium(y),
+      nursery=nurseryMonthly(y,returned),nurseryCost=nursery.total,
+      old=y<n('oldCarY')?n('oldCar'):0,stu=y<n('studentY')?n('student'):0,
+      mp=mom>0?(returned?n('momPay2'):n('momPay')):0,
+      trav=retired?n('retireLifestyle'):(liquid>=n('rich')?n('travelRich'):n('travel'))/12,
+      free=retired?0:n('free')/12;
   const agesNow=childAges(y);
   const allowanceMonthlyByChild=agesNow.map(a=>(a>=0&&a<18)?n('allowance')/12:0);
   const allowanceMonthly=allowanceMonthlyByChild.reduce((a,b)=>a+b,0);
